@@ -1,0 +1,29 @@
+#!/bin/bash
+#PBS -N voxtral_tf_check
+#PBS -l select=1:ncpus=20:mem=180gb:ngpus=1
+#PBS -l walltime=24:00:00
+#PBS -q gpu_1d
+#PBS -o logs/run_transformers.log
+#PBS -e logs/run_transformers.err
+set -eo pipefail
+cd "$PBS_O_WORKDIR"
+module load /app/common/modules/anaconda3-2024.10
+eval "$("$(command -v conda)" shell.bash hook)"
+source activate voxtral_eval
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+
+MODEL_DIR="$PWD/Voxtral-Mini-4B-Realtime-Arabic"
+MANIFESTS="data-test/prepared/manifest_prism.csv data-test/prepared/manifest_probe.csv"
+RUN=eval/runs/run_20261112_0440
+mkdir -p "$RUN/transformers"
+
+FREE=$(nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits | head -1)
+echo "Mémoire GPU libre : ${FREE} MiB (noeud $(hostname))"
+[ "${FREE:-0}" -lt 30000 ] && { echo "!! GPU occupé, arrêt"; nvidia-smi; exit 2; }
+{ hostname; nvidia-smi; pip freeze; } > "$RUN/transformers/environment.txt" 2>&1
+
+python -u eval/infer_transformers.py --model-dir "$MODEL_DIR" --manifests $MANIFESTS \
+  --out "$RUN/transformers/predictions.csv"
+python -u eval/compute_metrics.py --manifests $MANIFESTS --predictions "$RUN/transformers/predictions.csv" \
+  --normalization-dir "$MODEL_DIR" --out "$RUN/transformers"
+echo "Terminé."
