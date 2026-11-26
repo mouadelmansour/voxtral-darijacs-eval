@@ -5,7 +5,7 @@ Usage :
 
 Entrées : results/vllm_realtime/{metrics.json,predictions_scored.csv}, results/transformers/metrics.json,
 sorties de analysis/error_analysis.py. Seules les valeurs du model card (lues sur ses figures
-benchmark_scores.png et avg_evals_by_delay.png) sont écrites dans ce script.
+benchmark_scores.png) sont écrites dans ce script.
 """
 import argparse, json, os
 import pandas as pd
@@ -15,6 +15,8 @@ ap.add_argument("--results", default="results")
 ap.add_argument("--analysis", default="analysis/out")
 ap.add_argument("--template", default=os.path.join(os.path.dirname(__file__), "site", "template.html"))
 ap.add_argument("--out", default="docs/site/index.html")
+ap.add_argument("--repro", default="results/run_repro_20261125",
+                help="exécution complète contenant verification/ et analysis/ (tests de robustesse)")
 a = ap.parse_args()
 
 M = json.load(open(os.path.join(a.results, "vllm_realtime", "metrics.json"), encoding="utf-8"))
@@ -89,13 +91,55 @@ DATA = {
     "examples": examples, "rows": rows, "time": M["temps_inference"],
     "tf": {**TF, "sens": {"brackets": tfs["Probe_annotations_crochets_retirees_avant_normalisation"]["cer"]["taux_corpus_pct"],
                           "no30": tfs["Probe_sans_probe_30"]["cer"]["taux_corpus_pct"]}},
-    # Valeurs du model card, lues sur benchmark_scores.png et avg_evals_by_delay.png
-    "card": {"Realtime": {"Moyenne 7 benchmarks": 8.82, "ISMA (= Prism)": 6.68, "Darija in the Wild (= Probe)": 9.69, "MGB-2": 5.31,
+    # Valeurs du model card, lues sur benchmark_scores.png
+    "card": {"Realtime": {"ISMA (= Prism)": 6.68, "Darija in the Wild (= Probe)": 9.69, "MGB-2": 5.31,
                           "SADA": 13.75, "Casablanca": 20.34, "FLEURS": 2.66, "MASC clean": 3.33},
-             "Transcribe": {"Moyenne 7 benchmarks": 7.91, "ISMA (= Prism)": 4.96, "Darija in the Wild (= Probe)": 8.97, "MGB-2": 4.83,
-                            "SADA": 12.25, "Casablanca": 18.60, "FLEURS": 2.27, "MASC clean": 3.50},
-             "delay": [[80, 10.64], [160, 9.76], [320, 9.17], [480, 8.82], [720, 8.80]]},
+             "Transcribe": {"ISMA (= Prism)": 4.96, "Darija in the Wild (= Probe)": 8.97, "MGB-2": 4.83,
+                            "SADA": 12.25, "Casablanca": 18.60, "FLEURS": 2.27, "MASC clean": 3.50}},
 }
+
+
+def verification(repro):
+    """Tests de robustesse : lus dans verification/*/metrics.json, verification/SYNTHESE.txt,
+    analysis/comparaison_original.txt et analysis/analyse_canaux_prism.csv."""
+    import re
+    V = os.path.join(repro, "verification")
+    if not os.path.isdir(V):
+        return None
+    def res(d, sub):
+        m = json.load(open(os.path.join(V, d, "metrics.json"), encoding="utf-8"))["resultats_principaux"][sub]
+        return {"cer": m["cer"]["taux_corpus_pct"], "lo": m["cer"]["ic95_bootstrap_pct"][0], "hi": m["cer"]["ic95_bootstrap_pct"][1],
+                "wer": m["wer"]["taux_corpus_pct"], "n": m["n_echantillons"], "h": m["duree_h"]}
+    def identical(path):
+        out, cur = {}, None
+        for line in open(path, encoding="utf-8"):
+            h = re.match(r"=== (.+?)\s+vs\s+(.+?) : ", line)
+            if h:
+                cur = h.group(2).strip(); out[cur] = {}
+            m = re.match(r"(\w+)\s+transcriptions identiques : (\d+)/(\d+)", line)
+            if m and cur:
+                out[cur][m.group(1)] = [int(m.group(2)), int(m.group(3))]
+        return out
+    syn = identical(os.path.join(V, "SYNTHESE.txt"))
+    indep = []
+    for line in open(os.path.join(V, "SYNTHESE.txt"), encoding="utf-8"):
+        m = re.match(r"(Prism|Probe)\s+n=(\d+)\s+CER=([\d.]+) %", line)
+        if m:
+            indep.append({"subset": m.group(1), "n": int(m.group(2)), "cer": float(m.group(3))})
+    rep = identical(os.path.join(repro, "analysis", "comparaison_original.txt"))
+    ch = pd.read_csv(os.path.join(repro, "analysis", "analyse_canaux_prism.csv"))
+    st = ch[ch["canaux"] == 2]
+    suspect = (st["corr_gd"] < 0.5) | (st["diff"] > st["moyenne"] - 3) | ((st["gauche"] - st["droite"]).abs() > 6)
+    return {"fleurs": res("D_fleurs", "FLEURS"), "fleursTr": res("D_fleurs_transcription", "FLEURS"),
+            "C": res("C_prism_gauche_soxr", "Prism"),
+            "A": syn.get("A répétition"), "B": syn.get("B pace 1"), "E": syn.get("E format Mistral"),
+            "TF": syn.get("Transformers"), "repro": next(iter(rep.values()), None), "independent": indep,
+            "channels": {"stereo": int(len(st)), "mono": int((ch["canaux"] == 1).sum()), "suspects": int(suspect.sum()),
+                         "corrMin": round(float(st["corr_gd"].min()), 2), "corrMed": round(float(st["corr_gd"].median()), 2),
+                         "cerMono": round(float(ch[ch["canaux"] == 1]["cer"].mean()), 2), "cerStereo": round(float(st["cer"].mean()), 2)}}
+
+
+DATA["verif"] = verification(a.repro)
 tpl = open(a.template, encoding="utf-8").read()
 assert tpl.count("/*DATA*/") == 1
 data = json.dumps(DATA, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
