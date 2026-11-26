@@ -22,12 +22,12 @@ Thu Nov 12 04:40:16 2026
 |  No running processes found                                                             |
 +-----------------------------------------------------------------------------------------+
 == modèle
-560dcfc0ab20712191f13d76a55fd700f5643b9b1b85e6cb6842b821bd11771c  /home/skiredj.abderrahman/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic/config.json
-03782b9b3059ed02f09300048f493198537821dddd020e0eacd9789711776e67  /home/skiredj.abderrahman/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic/generation_config.json
-2ace010ebf7f0b62c60747d91c6d140e3c7238632d3e9c63d60a2bd2065ea301  /home/skiredj.abderrahman/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic/params.json
-5fbc4247e0b3b72c1b501b872c4fd6432b1f0fcc1939dcdf1fa5142c6d2ce070  /home/skiredj.abderrahman/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic/processor_config.json
-2a88a9b8fdbb6d1c65de7a0539a7f8f00ffb8d9e9d630b1c19c852dac48375bc  /home/skiredj.abderrahman/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic/tekken.json
-501255ef37965a55b20de0347530475b7ecabef40adc3f6ad65d245603a249d2  /home/skiredj.abderrahman/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic/normalization.py
+560dcfc0ab20712191f13d76a55fd700f5643b9b1b85e6cb6842b821bd11771c  /home/user/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic/config.json
+03782b9b3059ed02f09300048f493198537821dddd020e0eacd9789711776e67  /home/user/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic/generation_config.json
+2ace010ebf7f0b62c60747d91c6d140e3c7238632d3e9c63d60a2bd2065ea301  /home/user/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic/params.json
+5fbc4247e0b3b72c1b501b872c4fd6432b1f0fcc1939dcdf1fa5142c6d2ce070  /home/user/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic/processor_config.json
+2a88a9b8fdbb6d1c65de7a0539a7f8f00ffb8d9e9d630b1c19c852dac48375bc  /home/user/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic/tekken.json
+501255ef37965a55b20de0347530475b7ecabef40adc3f6ad65d245603a249d2  /home/user/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic/normalization.py
 == configuration audio / délai
 == tekken.json
   audio.transcription_delay_ms = 480
