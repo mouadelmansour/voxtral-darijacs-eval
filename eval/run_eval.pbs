@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N voxtral_darijacs
-#PBS -l select=1:ncpus=16:mem=96gb:ngpus=1
-#PBS -l walltime=06:00:00
+#PBS -l select=1:ncpus=20:mem=180gb:ngpus=1
+#PBS -l walltime=24:00:00
 #PBS -q gpu_1d
 #PBS -o logs/run_eval.log
 #PBS -e logs/run_eval.err
