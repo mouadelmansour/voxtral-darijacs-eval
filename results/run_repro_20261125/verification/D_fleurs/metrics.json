@@ -1,0 +1,57 @@
+{
+  "protocole_metriques": {
+    "normalisation": "normalize_arabic_asr (normalization.py officiel) sur référence et hypothèse",
+    "cer": "corpus : somme(S+D+I) / somme(N caractères de référence), espaces inclus (jiwer.process_characters)",
+    "wer": "corpus : somme(S+D+I) / somme(N mots de référence) (jiwer.process_words)",
+    "ic95": "bootstrap percentile sur les échantillons, 1000 tirages, graine 0",
+    "jiwer": "voir pip freeze"
+  },
+  "resultats_principaux": {
+    "FLEURS": {
+      "n_echantillons": 428,
+      "n_echantillons_scores": 428,
+      "duree_h": 1.302,
+      "cer": {
+        "taux_corpus_pct": 2.81,
+        "ic95_bootstrap_pct": [
+          2.14,
+          3.76
+        ],
+        "moyenne_par_echantillon_pct": 2.63,
+        "S": 370,
+        "D": 613,
+        "I": 314,
+        "N": 46224,
+        "part_S_D_I_pct": [
+          28.5,
+          47.3,
+          24.2
+        ]
+      },
+      "wer": {
+        "taux_corpus_pct": 7.19,
+        "ic95_bootstrap_pct": [
+          6.16,
+          8.34
+        ],
+        "moyenne_par_echantillon_pct": 7.13,
+        "S": 444,
+        "D": 100,
+        "I": 58,
+        "N": 8370,
+        "part_S_D_I_pct": [
+          73.8,
+          16.6,
+          9.6
+        ]
+      }
+    }
+  },
+  "ventilations": {},
+  "sensibilite": {},
+  "temps_inference": {
+    "moyenne_s_par_echantillon": 3.678,
+    "total_s": 1574.3,
+    "rtf_global": 0.336
+  }
+}

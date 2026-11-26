@@ -1,0 +1,22 @@
+subset,categorie,n_mots,part_pct
+Prism,"quasi-identique (arabe, variante/clitique)",507,29.1
+Prism,substitution_franche (arabe),344,19.8
+Prism,changement_ecriture (latin->arabe),288,16.6
+Prism,suppression_arabe/autre,165,9.5
+Prism,suppression_latin,164,9.4
+Prism,insertion,152,8.7
+Prism,"quasi-identique (latin, variante/clitique)",47,2.7
+Prism,substitution_franche (latin),36,2.1
+Prism,changement_ecriture (arabe->latin),27,1.6
+Prism,substitution_franche (autre),9,0.5
+Prism,"quasi-identique (autre, variante/clitique)",1,0.1
+Probe,substitution_franche (arabe),106,23.4
+Probe,"quasi-identique (arabe, variante/clitique)",95,21.0
+Probe,changement_ecriture (latin->arabe),84,18.5
+Probe,suppression_arabe/autre,58,12.8
+Probe,suppression_latin,42,9.3
+Probe,insertion,38,8.4
+Probe,"quasi-identique (latin, variante/clitique)",13,2.9
+Probe,substitution_franche (latin),11,2.4
+Probe,changement_ecriture (arabe->latin),5,1.1
+Probe,substitution_franche (autre),1,0.2

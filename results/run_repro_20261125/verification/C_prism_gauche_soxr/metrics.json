@@ -1,0 +1,102 @@
+{
+  "protocole_metriques": {
+    "normalisation": "normalize_arabic_asr (normalization.py officiel) sur référence et hypothèse",
+    "cer": "corpus : somme(S+D+I) / somme(N caractères de référence), espaces inclus (jiwer.process_characters)",
+    "wer": "corpus : somme(S+D+I) / somme(N mots de référence) (jiwer.process_words)",
+    "ic95": "bootstrap percentile sur les échantillons, 1000 tirages, graine 0",
+    "jiwer": "voir pip freeze"
+  },
+  "resultats_principaux": {
+    "Prism": {
+      "n_echantillons": 357,
+      "n_echantillons_scores": 357,
+      "duree_h": 1.495,
+      "cer": {
+        "taux_corpus_pct": 9.22,
+        "ic95_bootstrap_pct": [
+          8.26,
+          10.21
+        ],
+        "moyenne_par_echantillon_pct": 9.04,
+        "S": 2425,
+        "D": 2033,
+        "I": 787,
+        "N": 56870,
+        "part_S_D_I_pct": [
+          46.2,
+          38.8,
+          15.0
+        ]
+      },
+      "wer": {
+        "taux_corpus_pct": 17.76,
+        "ic95_bootstrap_pct": [
+          16.5,
+          19.16
+        ],
+        "moyenne_par_echantillon_pct": 17.53,
+        "S": 1278,
+        "D": 344,
+        "I": 151,
+        "N": 9983,
+        "part_S_D_I_pct": [
+          72.1,
+          19.4,
+          8.5
+        ]
+      }
+    }
+  },
+  "ventilations": {
+    "Prism": {}
+  },
+  "sensibilite": {
+    "Prism_doublons_exacts_retires": {
+      "retires": [
+        "prism_188"
+      ],
+      "n_echantillons": 356,
+      "n_echantillons_scores": 356,
+      "duree_h": 1.489,
+      "cer": {
+        "taux_corpus_pct": 9.24,
+        "ic95_bootstrap_pct": [
+          8.35,
+          10.18
+        ],
+        "moyenne_par_echantillon_pct": 9.06,
+        "S": 2424,
+        "D": 2032,
+        "I": 785,
+        "N": 56706,
+        "part_S_D_I_pct": [
+          46.3,
+          38.8,
+          15.0
+        ]
+      },
+      "wer": {
+        "taux_corpus_pct": 17.78,
+        "ic95_bootstrap_pct": [
+          16.58,
+          19.12
+        ],
+        "moyenne_par_echantillon_pct": 17.56,
+        "S": 1276,
+        "D": 344,
+        "I": 151,
+        "N": 9959,
+        "part_S_D_I_pct": [
+          72.0,
+          19.4,
+          8.5
+        ]
+      }
+    }
+  },
+  "temps_inference": {
+    "moyenne_s_par_echantillon": 4.982,
+    "total_s": 1778.5,
+    "rtf_global": 0.3305
+  }
+}

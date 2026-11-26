@@ -1,0 +1,17 @@
+subset,variante,CER_%,model_card_%,ecart_pp
+Prism,"Principal : officielle, corpus, espaces inclus",9.03,6.68,2.35
+Prism,"Officielle, corpus, sans espaces",9.69,6.68,3.01
+Prism,"Officielle, moyenne par échantillon",8.81,6.68,2.13
+Prism,"Officielle, moyenne par échantillon, sans espaces",9.46,6.68,2.78
+Prism,"Officielle, corpus, sans prism_133 (sortie vide)",8.77,6.68,2.09
+Prism,"Officielle, corpus, sans prism_246 ni prism_133",8.54,6.68,1.86
+Prism,Normalisation minimale (non officielle),10.85,6.68,4.17
+Prism,Aucune normalisation (textes bruts),13.13,6.68,6.45
+Probe,"Principal : officielle, corpus, espaces inclus",13.42,9.69,3.73
+Probe,"Officielle, corpus, sans espaces",14.41,9.69,4.72
+Probe,"Officielle, moyenne par échantillon",14.01,9.69,4.32
+Probe,"Officielle, moyenne par échantillon, sans espaces",15.05,9.69,5.36
+Probe,"Officielle, corpus, sans prism_133 (sortie vide)",13.42,9.69,3.73
+Probe,"Officielle, corpus, sans prism_246 ni prism_133",13.42,9.69,3.73
+Probe,Normalisation minimale (non officielle),14.75,9.69,5.06
+Probe,Aucune normalisation (textes bruts),16.64,9.69,6.95

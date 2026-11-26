@@ -50,3 +50,9 @@ les dates réelles des exécutions sont ci-dessous.
   (`metrics.json`, `predictions_scored.csv`, `environment.txt`) et la synthèse des tests de robustesse
   sont conservés dans `results/`.
 - Ajout de `scripts/run_pipeline.pbs` pour régénérer toutes les sorties à partir du dépôt seul.
+
+## 2026-11-25 : reproduction complète depuis le dépôt
+
+- Nouvelle exécution de tout le pipeline à partir d'un clone du dépôt (job 13677) : 466/466 transcriptions identiques
+  à l'exécution du 12 novembre, mêmes CER (Prism 9,03 %, Probe 13,42 %), FLEURS 2,81 %.
+  Les sorties perdues (Transformers, tests de robustesse, analyses) sont régénérées dans `results/run_repro_20261125/`.

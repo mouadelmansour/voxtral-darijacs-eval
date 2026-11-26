@@ -1,0 +1,25 @@
+Sorties vides : 2 -> prism_133, probe_30
+Prism : 329 mots supprimés, dont 7.9 % dans les 10 % finaux de la référence
+Probe : 100 mots supprimés, dont 7.0 % dans les 10 % finaux de la référence
+Suppressions en fin d'enregistrement : 19 enregistrements, 50 mots
+prism_81: CER propre 0.305 | meilleure référence prism_81 (0.305)
+prism_84: CER propre 0.333 | meilleure référence prism_84 (0.333)
+prism_116: CER propre 0.257 | meilleure référence prism_116 (0.257)
+prism_122: CER propre 0.256 | meilleure référence prism_122 (0.256)
+prism_140: CER propre 0.295 | meilleure référence prism_140 (0.295)
+prism_141: CER propre 0.320 | meilleure référence prism_141 (0.320)
+prism_166: CER propre 0.306 | meilleure référence prism_166 (0.306)
+prism_225: CER propre 0.329 | meilleure référence prism_225 (0.329)
+prism_246: CER propre 0.775 | meilleure référence prism_252 (0.649)  <-- ne correspond à aucune référence du dataset (référence erronée ?)
+prism_280: CER propre 0.386 | meilleure référence prism_280 (0.386)
+prism_288: CER propre 0.271 | meilleure référence prism_288 (0.271)
+prism_307: CER propre 0.284 | meilleure référence prism_307 (0.284)
+prism_331: CER propre 0.287 | meilleure référence prism_331 (0.287)
+prism_332: CER propre 0.268 | meilleure référence prism_332 (0.268)
+probe_23: CER propre 0.438 | meilleure référence probe_23 (0.438)
+probe_33: CER propre 0.363 | meilleure référence probe_33 (0.363)
+probe_54: CER propre 0.542 | meilleure référence probe_54 (0.542)
+probe_66: CER propre 0.530 | meilleure référence probe_66 (0.530)
+probe_87: CER propre 0.373 | meilleure référence probe_87 (0.373)
+probe_108: CER propre 0.361 | meilleure référence probe_108 (0.361)
+probe_113: CER propre 0.391 | meilleure référence probe_113 (0.391)

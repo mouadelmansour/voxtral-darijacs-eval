@@ -25,3 +25,14 @@ Le dossier de travail du cluster a été supprimé après ces exécutions. Les a
 (prédictions du contrôle Transformers, sorties détaillées des tests A à E et de FLEURS, analyse des canaux)
 ne sont pas conservées. Elles sont régénérées par une nouvelle exécution complète du dépôt :
 `qsub scripts/run_pipeline.pbs` sur le cluster, ou l'image Podman (voir le README principal).
+
+## `run_repro_20261125/` : nouvelle exécution complète depuis le dépôt (25 novembre 2026)
+
+Exécution de `scripts/run_pipeline.pbs` (job PBS 13677) sur un clone de ce dépôt, après un nouveau téléchargement
+du modèle et du dataset aux révisions fixées et une nouvelle préparation audio (`scripts/run_pipeline.sh download prepare`).
+
+- Évaluation vLLM : **466/466 transcriptions identiques** à `run_20261112_0440` ; Prism 9,03 %, Probe 13,42 %
+  (`analysis/comparaison_original.txt`).
+- Contrôle Transformers (`transformers/`), tests de robustesse A à E et FLEURS (`verification/`) : FLEURS 2,81 % [2,14 – 3,76].
+- Analyses (`analysis/`) : variantes de calcul du CER, erreurs par écriture, catégories d'erreurs, analyse des canaux stéréo,
+  examen de prism_133, contrôles d'intégrité.

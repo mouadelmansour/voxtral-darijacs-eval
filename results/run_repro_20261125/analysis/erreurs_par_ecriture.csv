@@ -1,0 +1,7 @@
+subset,ecriture_ref,mots,correct_pct,erreur_pct,subst_meme_ecriture,subst_vers_autre_ecriture,supprime
+Prism,arabe,8465,87.7,12.3,851,27,164
+Prism,chiffre,70,84.3,15.7,10,0,1
+Prism,latin,1448,63.1,36.9,83,288,164
+Probe,arabe,1529,83.2,16.8,201,5,51
+Probe,chiffre,9,11.1,88.9,1,0,7
+Probe,latin,409,63.3,36.7,24,84,42
