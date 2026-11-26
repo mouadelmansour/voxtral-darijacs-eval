@@ -19,13 +19,6 @@ Synthèse produite par `eval/run_verify.pbs` : comparaisons enregistrement par e
 envoi en temps réel, variante audio, format Mistral, vLLM contre Transformers), recalcul indépendant du CER
 et options effectives du serveur vLLM. Résultat FLEURS de cette exécution : CER 2,81 % [IC 95 % 2,14 – 3,76], n = 428.
 
-## Fichiers perdus
-
-Le dossier de travail du cluster a été supprimé après ces exécutions. Les autres sorties
-(prédictions du contrôle Transformers, sorties détaillées des tests A à E et de FLEURS, analyse des canaux)
-ne sont pas conservées. Elles sont régénérées par une nouvelle exécution complète du dépôt :
-`qsub scripts/run_pipeline.pbs` sur le cluster, ou l'image Podman (voir le README principal).
-
 ## `run_repro_20261125/` : nouvelle exécution complète depuis le dépôt (25 novembre 2026)
 
 Exécution de `scripts/run_pipeline.pbs` (job PBS 13677) sur un clone de ce dépôt, après un nouveau téléchargement
