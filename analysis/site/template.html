@@ -249,7 +249,6 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
   <span class="secnum">02</span>
   <h2>Contexte et question</h2>
   <p>Le model card de <code>Voxtral-Mini-4B-Realtime-Arabic</code> annonce un CER moyen de <strong>8,82 %</strong> sur sept benchmarks arabes, avec un délai de transcription configuré à 480 ms. DarijaCS est le benchmark public de darija marocaine avec code-switching publié par le ministère marocain de la Transition numérique. Il comprend deux sous-ensembles : <strong>Prism</strong> (couverture large, 357 enregistrements) et <strong>Probe</strong> (cas ciblés pour révéler des faiblesses, 109 enregistrements).</p>
-  <p>La question posée est la suivante : évalué sur DarijaCS avec le protocole et la normalisation des auteurs, le modèle obtient-il les scores annoncés ? Pour y répondre, nous avons vérifié chaque élément avant de lancer l'évaluation : le dépôt du modèle, la structure du dataset, le format audio, le délai configuré et la fonction de normalisation.</p>
   <p class="note">Le CER (Character Error Rate) compte les substitutions, suppressions et insertions de caractères nécessaires pour passer de la transcription du modèle à la référence, divisées par le nombre de caractères de la référence. Le WER fait la même chose au niveau des mots.</p>
 </section>
 
