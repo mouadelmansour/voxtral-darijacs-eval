@@ -1,0 +1,87 @@
+#!/bin/bash
+#PBS -N voxtral_verif
+#PBS -l select=1:ncpus=20:mem=180gb:ngpus=1
+#PBS -l walltime=24:00:00
+#PBS -q gpu_1d
+#PBS -o logs/run_verify.log
+#PBS -e logs/run_verify.err
+
+# Vérification des résultats avant diffusion :
+#  A  répétition à l'identique (déterminisme)             DarijaCS complet
+#  B  envoi à cadence temps réel (--pace 1)                Probe
+#  C  autre prétraitement audio (canal gauche + soxr)      Prism
+#  D  calibration sur FLEURS arabe (model card : 2,66 %)   FLEURS ar_eg test
+#  E  vLLM forcé au format Mistral (tokenizer/config/poids) DarijaCS complet
+set -eo pipefail
+cd "$PBS_O_WORKDIR"
+module load /app/common/modules/anaconda3-2024.10
+eval "$("$(command -v conda)" shell.bash hook)"
+source activate voxtral_eval
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 VLLM_USE_FLASHINFER_SAMPLER=0
+
+MODEL_DIR="$PWD/Voxtral-Mini-4B-Realtime-Arabic"
+NAME="Morocco-MITNRA-Labs/Voxtral-Mini-4B-Realtime-Arabic"
+P=data-test/prepared
+ORIG=eval/runs/run_20261112_0440
+V="${V:-eval/runs/verif_$(date +%Y%m%d_%H%M)}"
+mkdir -p "$V"/{A_repetition,B_probe_pace1,C_prism_gauche_soxr,D_fleurs,E_format_mistral}
+PORT=$((8100 + RANDOM % 800))
+
+FREE=$(nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits | head -1)
+echo "Mémoire GPU libre : ${FREE} MiB (noeud $(hostname))"
+[ "${FREE:-0}" -lt 30000 ] && { echo "!! GPU occupé, arrêt"; nvidia-smi; exit 2; }
+{ hostname; nvidia-smi; pip freeze; python eval/check_delay.py "$MODEL_DIR"; } > "$V/environment.txt" 2>&1
+
+start_server () {  # $1 = fichier log, $2... = options supplémentaires
+  local log=$1; shift
+  vllm serve "$MODEL_DIR" --served-model-name "$NAME" --port "$PORT" --enforce-eager \
+    --override-generation-config '{"temperature": 0.0}' "$@" > "$log" 2>&1 &
+  SERVER_PID=$!
+  for i in $(seq 1 90); do
+    curl -sf "localhost:$PORT/health" >/dev/null 2>&1 && { echo "Serveur prêt ($log)"; return 0; }
+    kill -0 $SERVER_PID 2>/dev/null || { echo "Serveur arrêté"; tail -40 "$log"; exit 1; }
+    sleep 10
+  done
+  echo "Serveur non prêt"; exit 1
+}
+stop_server () { kill $SERVER_PID 2>/dev/null || true; wait $SERVER_PID 2>/dev/null || true; }
+trap 'stop_server' EXIT
+infer () { python -u eval/infer_vllm_realtime.py --port "$PORT" --model "$NAME" --concurrency 1 "$@" || true; }
+metrics () { python -u eval/compute_metrics.py --manifests $2 --predictions "$1/predictions.csv" \
+               --normalization-dir "$MODEL_DIR" --out "$1" || echo "!! métriques $1 en échec"; }
+
+# --- Serveur identique au run principal ---
+start_server "$V/vllm_server_defaut.log"
+infer --manifests $P/manifest_prism.csv $P/manifest_probe.csv --out "$V/A_repetition/predictions.csv"
+infer --manifests $P/manifest_probe.csv --pace 1 --out "$V/B_probe_pace1/predictions.csv"
+infer --manifests data-test/prepared_left_soxr/manifest_prism.csv --out "$V/C_prism_gauche_soxr/predictions.csv"
+infer --manifests data-test/fleurs_ar_eg/manifest_fleurs.csv --out "$V/D_fleurs/predictions.csv"
+stop_server
+
+# --- Serveur forcé au format Mistral ---
+start_server "$V/vllm_server_mistral.log" --tokenizer-mode mistral --config-format mistral --load-format mistral
+infer --manifests $P/manifest_prism.csv $P/manifest_probe.csv --out "$V/E_format_mistral/predictions.csv"
+stop_server
+
+# --- Métriques ---
+metrics "$V/A_repetition"        "$P/manifest_prism.csv $P/manifest_probe.csv"
+metrics "$V/B_probe_pace1"       "$P/manifest_probe.csv"
+metrics "$V/C_prism_gauche_soxr" "data-test/prepared_left_soxr/manifest_prism.csv"
+metrics "$V/D_fleurs"            "data-test/fleurs_ar_eg/manifest_fleurs.csv"
+metrics "$V/E_format_mistral"    "$P/manifest_prism.csv $P/manifest_probe.csv"
+
+# --- Comparaisons échantillon par échantillon ---
+{
+  python eval/compare_runs.py $ORIG/predictions_scored.csv "$V/A_repetition/predictions_scored.csv" "run principal" "A répétition"
+  python eval/compare_runs.py $ORIG/predictions_scored.csv "$V/B_probe_pace1/predictions_scored.csv" "run principal" "B pace 1"
+  python eval/compare_runs.py $ORIG/predictions_scored.csv "$V/C_prism_gauche_soxr/predictions_scored.csv" "run principal" "C gauche+soxr"
+  python eval/compare_runs.py $ORIG/predictions_scored.csv "$V/E_format_mistral/predictions_scored.csv" "run principal" "E format Mistral"
+  python eval/compare_runs.py $ORIG/predictions_scored.csv "$ORIG/transformers/predictions_scored.csv" "vLLM" "Transformers"
+  for f in $ORIG/predictions_scored.csv $ORIG/transformers/predictions_scored.csv; do
+    python eval/verify_cer_independent.py "$f" "$MODEL_DIR"
+  done
+  echo "=== Délai et format chargés par vLLM"
+  grep -hiE "delay|tokenizer_mode|load_format|config_format" "$V"/vllm_server_*.log | head -12
+} > "$V/SYNTHESE.txt" 2>&1
+cat "$V/SYNTHESE.txt"
+echo "Terminé : $V"

@@ -115,9 +115,8 @@ def main():
     }, "resultats_principaux": {}, "ventilations": {}, "sensibilite": {}}
 
     prism, probe = df[df.subset == "Prism"], df[df.subset == "Probe"]
-    for name, sub in (("Prism", prism), ("Probe", probe)):
-        if len(sub):
-            metrics["resultats_principaux"][name] = summarize(sub)
+    for name, sub in df.groupby("subset", sort=True):
+        metrics["resultats_principaux"][name] = summarize(sub)
 
     if len(prism):
         metrics["ventilations"]["Prism"] = {c.replace("meta_", ""): by_group(prism, c)
