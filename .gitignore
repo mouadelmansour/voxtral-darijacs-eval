@@ -1,0 +1,26 @@
+# Modèle et données : téléchargés aux révisions fixées (scripts/download_assets.sh), jamais versionnés
+/Voxtral-Mini-4B-Realtime-Arabic
+/models
+/modelcards
+/data-test
+/work
+/hf_cache
+
+# Sorties d'exécution brutes (les résultats retenus sont copiés dans results/)
+/eval/runs
+eval/*.log
+eval/*.csv
+eval/env_freeze.txt
+eval/ffmpeg_version.txt
+/logs
+*.log
+
+# Python
+__pycache__/
+*.pyc
+
+# Archives et téléchargements
+*.zip
+*.tar.gz
+*.m4a
+*.wav
