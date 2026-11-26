@@ -17,6 +17,7 @@ module load /app/common/modules/anaconda3-2024.10
 eval "$("$(command -v conda)" shell.bash hook)"
 source activate voxtral_eval
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+export VLLM_USE_FLASHINFER_SAMPLER=0
 
 MODEL_DIR="$PWD/Voxtral-Mini-4B-Realtime-Arabic"
 NAME="Morocco-MITNRA-Labs/Voxtral-Mini-4B-Realtime-Arabic"
@@ -37,6 +38,13 @@ echo "Dossier de résultats : $RUN"
 } > "$RUN/environment.txt" 2>&1
 
 # --- 1) Serveur vLLM ---
+FREE=$(nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits | head -1)
+echo "Mémoire GPU libre au démarrage : ${FREE} MiB (noeud $(hostname))"
+if [ "${FREE:-0}" -lt 30000 ]; then
+  echo "!! GPU déjà occupé par un autre processus (${FREE} MiB libres) : arrêt sans lancer vLLM"
+  nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv
+  exit 2
+fi
 vllm serve "$MODEL_DIR" --served-model-name "$NAME" --port "$PORT" --enforce-eager \
   --override-generation-config '{"temperature": 0.0}' > "$RUN/vllm_server.log" 2>&1 &
 SERVER_PID=$!
