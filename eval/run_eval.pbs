@@ -1,0 +1,68 @@
+#!/bin/bash
+#PBS -N voxtral_darijacs
+#PBS -l select=1:ncpus=16:mem=96gb:ngpus=1
+#PBS -l walltime=06:00:00
+#PBS -q gpu_1d
+#PBS -o logs/run_eval.log
+#PBS -e logs/run_eval.err
+
+# Évaluation DarijaCS (Prism + Probe) de Voxtral-Mini-4B-Realtime-Arabic
+#  1) vLLM Realtime, délai 480 ms (tekken.json), protocole principal
+#  2) métriques officielles (normalize_arabic_asr)
+#  3) contrôle croisé Transformers (do_sample=False), puis ses métriques
+set -eo pipefail
+cd "$PBS_O_WORKDIR"
+mkdir -p logs
+module load /app/common/modules/anaconda3-2024.10
+eval "$("$(command -v conda)" shell.bash hook)"
+source activate voxtral_eval
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+
+MODEL_DIR="$PWD/Voxtral-Mini-4B-Realtime-Arabic"
+NAME="Morocco-MITNRA-Labs/Voxtral-Mini-4B-Realtime-Arabic"
+MANIFESTS="data-test/prepared/manifest_prism.csv data-test/prepared/manifest_probe.csv"
+RUN="${RUN:-eval/runs/run_$(date +%Y%m%d_%H%M)}"
+PORT=$((8100 + RANDOM % 800))
+mkdir -p "$RUN"
+echo "Dossier de résultats : $RUN"
+
+# --- Traçabilité de l'environnement ---
+{
+  echo "date: $(date -Is)"; echo "noeud: $(hostname)"; echo "job: ${PBS_JOBID:-}"
+  nvidia-smi
+  echo "== modèle"; sha256sum "$MODEL_DIR"/*.json "$MODEL_DIR"/normalization.py
+  echo "== configuration audio / délai"; python eval/check_delay.py "$MODEL_DIR"
+  echo "== ffmpeg"; ffmpeg -version | head -1
+  echo "== pip freeze"; pip freeze
+} > "$RUN/environment.txt" 2>&1
+
+# --- 1) Serveur vLLM ---
+vllm serve "$MODEL_DIR" --served-model-name "$NAME" --port "$PORT" --enforce-eager \
+  --override-generation-config '{"temperature": 0.0}' > "$RUN/vllm_server.log" 2>&1 &
+SERVER_PID=$!
+trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+for i in $(seq 1 90); do
+  curl -sf "localhost:$PORT/health" >/dev/null 2>&1 && break
+  kill -0 $SERVER_PID 2>/dev/null || { echo "Le serveur vLLM s'est arrêté"; tail -60 "$RUN/vllm_server.log"; exit 1; }
+  sleep 10
+done
+curl -sf "localhost:$PORT/health" >/dev/null || { echo "Serveur vLLM non prêt après 15 min"; tail -60 "$RUN/vllm_server.log"; exit 1; }
+echo "Serveur vLLM prêt sur le port $PORT"
+
+python -u eval/infer_vllm_realtime.py --port "$PORT" --model "$NAME" \
+  --manifests $MANIFESTS --out "$RUN/predictions.csv" --concurrency 1 --pace 0 || true
+
+kill $SERVER_PID 2>/dev/null || true; wait $SERVER_PID 2>/dev/null || true
+
+# --- 2) Métriques (échoue volontairement s'il manque une prédiction) ---
+python -u eval/compute_metrics.py --manifests $MANIFESTS --predictions "$RUN/predictions.csv" \
+  --normalization-dir "$MODEL_DIR" --out "$RUN" || echo "!! Métriques vLLM non calculées (prédictions manquantes ?)"
+
+# --- 3) Contrôle croisé Transformers ---
+mkdir -p "$RUN/transformers"
+python -u eval/infer_transformers.py --model-dir "$MODEL_DIR" --manifests $MANIFESTS \
+  --out "$RUN/transformers/predictions.csv" || echo "!! Contrôle Transformers en échec"
+python -u eval/compute_metrics.py --manifests $MANIFESTS --predictions "$RUN/transformers/predictions.csv" \
+  --normalization-dir "$MODEL_DIR" --out "$RUN/transformers" || true
+
+echo "Terminé. Résultats dans $RUN"
