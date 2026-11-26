@@ -71,7 +71,7 @@ ex_ids = [("prism_280", "Code-switching : mots français écrits en arabe ; nom 
           ("prism_3", "Nombre et expression idiomatique (« لا ستة حمص ») mal reconnus"),
           ("prism_247", "Variantes orthographiques et clitiques seulement"),
           ("prism_246", "Référence erronée dans le dataset (copie de prism_247)"),
-          ("prism_133", "Sortie vide de vLLM sur de la parole bruitée"),
+          ("prism_133", "Aucune transcription (vLLM et Transformers) : parole presque inaudible sous le bruit"),
           ("probe_109", "Toponymes marocains reconnus sans erreur")]
 d = df.set_index("sample_id")
 examples = [{"id": i, "type": t, "ref": d.loc[i, "reference_norm"], "hyp": d.loc[i, "hypothesis_norm"],

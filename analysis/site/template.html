@@ -414,7 +414,7 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
     <thead><tr><th>Enregistrement</th><th>Problème</th><th>Effet mesuré</th></tr></thead>
     <tbody>
       <tr><td><code>prism_246</code></td><td><strong>Référence erronée.</strong> Elle est identique mot pour mot à celle de <code>prism_247</code>, qui parle de cryptomonnaies. Le modèle transcrit pourtant un passage cohérent sur les taux d'intérêt. Aucune autre référence du dataset ne correspond à cet audio (meilleur CER croisé : 64,9 %).</td><td class="num">CER 77,5 %<span class="sub">Prism sans lui : 8,80 %</span></td></tr>
-      <tr><td><code>prism_133</code></td><td><strong>Sortie vide de vLLM</strong> sur 10,7 s de parole bruitée.</td><td class="num">CER 100 %<span class="sub">Prism sans lui : 8,77 %</span></td></tr>
+      <tr><td><code>prism_133</code></td><td><strong>Aucune transcription</strong>, ni par vLLM ni par Transformers. Fichier mono étiqueté <code>Noise = noise</code> : à l'écoute, la parole est presque inaudible sous le bruit. Ce n'est pas une erreur d'inférence.</td><td class="num">CER 100 %<span class="sub">Prism sans lui : 8,77 %</span></td></tr>
       <tr><td><code>prism_187</code> / <code>188</code></td><td>Doublon exact : même audio, même référence.</td><td class="num">Sans 188 : 9,04 %</td></tr>
       <tr><td>8 références de Probe</td><td>Annotations de silence non prononcées, gardées par la normalisation sous forme de mots.</td><td class="num">Retirées : 12,62 %</td></tr>
       <tr><td><code>probe_30</code></td><td>Référence <code>[silence]</code> seule. Le modèle ne produit rien, ce qui est le comportement attendu, mais il est compté à 100 % d'erreur.</td><td class="num">Sans lui : 13,36 %</td></tr>
@@ -501,7 +501,7 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
   <h3>Recommandations</h3>
   <ol>
     <li><strong>Demander aux auteurs</strong> leur script d'évaluation, leurs prédictions par enregistrement et la version exacte de l'audio et des références.</li>
-    <li><strong>Relances peu coûteuses</strong> : chargement de l'audio comme dans l'exemple du README, canal gauche seul, cadence temps réel, comparaison vLLM / Transformers enregistrement par enregistrement, examen de <code>prism_133</code>.</li>
+    <li><strong>Relances peu coûteuses</strong> : chargement de l'audio comme dans l'exemple du README, canal gauche seul, cadence temps réel, comparaison vLLM / Transformers enregistrement par enregistrement.</li>
     <li><strong>Corriger DarijaCS</strong> : référence de <code>prism_246</code>, doublon <code>187</code>/<code>188</code>, annotations de silence de Probe, valeurs <code>Pace</code> manquantes, confusion entre le domaine Entrepreneuriat et les conditions de bruit et de vitesse.</li>
     <li><strong>Vérifier la moyenne de 8,82 %</strong> en évaluant avec le même pipeline les cinq autres benchmarks publics (MGB-2, SADA, Casablanca, FLEURS arabe, MASC clean).</li>
     <li><strong>Étendre la normalisation</strong> aux variantes orthographiques fréquentes de la darija et documenter le traitement des emprunts écrits en arabe. Ce sont les deux principales sources d'erreur mesurées.</li>
