@@ -1,0 +1,113 @@
+=== run principal  vs  A répétition : 466 échantillons en commun
+Prism   transcriptions identiques : 357/357 (100.0 %)   CER run principal = 9.03 %   CER A répétition = 9.03 %   écart = +0.00 pt
+Probe   transcriptions identiques : 109/109 (100.0 %)   CER run principal = 13.42 %   CER A répétition = 13.42 %   écart = +0.00 pt
+
+Plus grands écarts par échantillon (CER B - CER A, en points) :
+  prism_1        +0.0   A: 'استغل معي واحد المدينه ما كتشبه لتا مدينه شفتيها فشي فيلم ولا سافرتي ل'
+                        B: 'استغل معي واحد المدينه ما كتشبه لتا مدينه شفتيها فشي فيلم ولا سافرتي ل'
+  prism_2        +0.0   A: 'في العشيه جالس مع واحد الشيباني خطير ومدوز طلع بك لواحد السطح عالي كيب'
+                        B: 'في العشيه جالس مع واحد الشيباني خطير ومدوز طلع بك لواحد السطح عالي كيب'
+  prism_3        +0.0   A: 'الارقام numbers في اللول كاع بنادم ما كان عارف لا مات لا ستاح النص كان'
+                        B: 'الارقام numbers في اللول كاع بنادم ما كان عارف لا مات لا ستاح النص كان'
+  prism_4        +0.0   A: 'واحد النهار واحد كيصرح الغنم بدا كيفكر وشاف بلي 3 د الحجرات 3 د الغنم '
+                        B: 'واحد النهار واحد كيصرح الغنم بدا كيفكر وشاف بلي 3 د الحجرات 3 د الغنم '
+  prism_5        +0.0   A: 'ما بقاش كيشوف الغنم ولا كيشوف la quantite الكميه وتما تزادت l arithmet'
+                        B: 'ما بقاش كيشوف الغنم ولا كيشوف la quantite الكميه وتما تزادت l arithmet'
+  prism_6        +0.0   A: 'الروينه ديال irrational البيطاغوريين كان حساب لهم بلي العالم مفصل غير '
+                        B: 'الروينه ديال irrational البيطاغوريين كان حساب لهم بلي العالم مفصل غير '
+  prism_7        +0.0   A: 'تالي واحد النهار جاو يحسبو الضلع ديال واحد المربع بسيط كاغي وخرج لهم غ'
+                        B: 'تالي واحد النهار جاو يحسبو الضلع ديال واحد المربع بسيط كاغي وخرج لهم غ'
+  prism_8        +0.0   A: 'هادي كانت صدمه في السيستيم ديالهم لدرجه الاسطوره كتقول بلي قتلو هاداك '
+                        B: 'هادي كانت صدمه في السيستيم ديالهم لدرجه الاسطوره كتقول بلي قتلو هاداك '
+=== run principal  vs  B pace 1 : 109 échantillons en commun
+Probe   transcriptions identiques : 109/109 (100.0 %)   CER run principal = 13.42 %   CER B pace 1 = 13.42 %   écart = +0.00 pt
+
+Plus grands écarts par échantillon (CER B - CER A, en points) :
+  probe_1        +0.0   A: 'صباح الخير عندي meeting دابا'
+                        B: 'صباح الخير عندي meeting دابا'
+  probe_2        +0.0   A: 'عافاك واش تقدر تصيفط لي le document في whatsapp'
+                        B: 'عافاك واش تقدر تصيفط لي le document في whatsapp'
+  probe_3        +0.0   A: 'اليوم انا very tired و ما عنديش طاقه'
+                        B: 'اليوم انا very tired و ما عنديش طاقه'
+  probe_4        +0.0   A: 'شويه غدي نمشي ل البيرو ومن بعد نقدر نرجع ل الدار'
+                        B: 'شويه غدي نمشي ل البيرو ومن بعد نقدر نرجع ل الدار'
+  probe_5        +0.0   A: 'واش تقدر دير update ل l application قبل غدا'
+                        B: 'واش تقدر دير update ل l application قبل غدا'
+  probe_6        +0.0   A: 'البارح درت une presentation و honestly دازت مزيان'
+                        B: 'البارح درت une presentation و honestly دازت مزيان'
+  probe_7        +0.0   A: 'قبيله خديت un cafe بلا سكر حيت بغيت نبقا focus'
+                        B: 'قبيله خديت un cafe بلا سكر حيت بغيت نبقا focus'
+  probe_8        +0.0   A: 'الكونيكسيون اليوم ضعيفه وكل مره كيطلع لي network error'
+                        B: 'الكونيكسيون اليوم ضعيفه وكل مره كيطلع لي network error'
+=== run principal  vs  C gauche+soxr : 357 échantillons en commun
+Prism   transcriptions identiques : 199/357 (55.7 %)   CER run principal = 9.03 %   CER C gauche+soxr = 9.22 %   écart = +0.20 pt
+
+Plus grands écarts par échantillon (CER B - CER A, en points) :
+  prism_340     +47.3   A: 'شاهد red tape كتبغي نفس طويل وقدره كبيره علا الصبر باش تقدر تخرج المشر'
+                        B: 'الدوله كتحاول تبسط الامور ولكن التطبيق علا ارض الواقع كياخد وقت باش يو'
+  prism_229     +16.2   A: 'لاكيب pi و ما الموشرات الادا لي كيعلموك واش البروجي غدي مزيان ولا لا ع'
+                        B: 'ليكيب بي اي هما الموشرات الادا لي كيعلموك واش البروجي غدي مزيان ولا لا'
+  prism_51      +13.6   A: 'la lumiere هو اسرع حاجه في الكون كيمشي ب 300 1000 كيلومتر في التانيه ب'
+                        B: 'هو اسرع حاجه في الكون كيمشي ب 300 1000 كيلومتر في التانيه ب الضبط'
+  prism_66      +13.0   A: 'النقط الاشاعي radioactivite هو من النواه ديال الدره كتكون ما مستقراش و'
+                        B: 'النقط الاشاعي لاغافيوكتيفيتي هو ل النواه ديال الدره كتكون ما مستقراش و'
+  prism_354     -12.1   A: 'طريقه اسره دكيه هي تبدا ب الباينوت باينوت بروجيكت يعني دير تجربه مصغره'
+                        B: 'طريقه اسره دكيه هي تبدا بال pilot project يعني دير تجربه مصغره مع شي ش'
+  prism_293     +11.4   A: 'وليلي فولوبوليس هي موقع اتري روماني قريب من مكناس فيها les mosaiques ب'
+                        B: 'وليلي فولوبيلس يامو حيعتري روماني قريب من مكناس فيها لموزاييك باقيين ب'
+  prism_166     -11.3   A: 'سعديون هما لي حكمو المغرب وحقو الانتصار الكبير في معركه الملوك التلاته'
+                        B: 'سعديون هما لي حكمو المغرب وحققو الانتصار الكبير في معركه الملوك التلات'
+  prism_332     -10.2   A: 'طريق ماشي دايما clear الفاوندر في المغرب خصو يكون couteau suisse و كيو'
+                        B: 'الطريق ماشي دايما clear الفاوندر في المغرب خصو يكون couteau suisse و ك'
+=== run principal  vs  E format Mistral : 466 échantillons en commun
+Prism   transcriptions identiques : 357/357 (100.0 %)   CER run principal = 9.03 %   CER E format Mistral = 9.03 %   écart = +0.00 pt
+Probe   transcriptions identiques : 109/109 (100.0 %)   CER run principal = 13.42 %   CER E format Mistral = 13.42 %   écart = +0.00 pt
+
+Plus grands écarts par échantillon (CER B - CER A, en points) :
+  prism_1        +0.0   A: 'استغل معي واحد المدينه ما كتشبه لتا مدينه شفتيها فشي فيلم ولا سافرتي ل'
+                        B: 'استغل معي واحد المدينه ما كتشبه لتا مدينه شفتيها فشي فيلم ولا سافرتي ل'
+  prism_2        +0.0   A: 'في العشيه جالس مع واحد الشيباني خطير ومدوز طلع بك لواحد السطح عالي كيب'
+                        B: 'في العشيه جالس مع واحد الشيباني خطير ومدوز طلع بك لواحد السطح عالي كيب'
+  prism_3        +0.0   A: 'الارقام numbers في اللول كاع بنادم ما كان عارف لا مات لا ستاح النص كان'
+                        B: 'الارقام numbers في اللول كاع بنادم ما كان عارف لا مات لا ستاح النص كان'
+  prism_4        +0.0   A: 'واحد النهار واحد كيصرح الغنم بدا كيفكر وشاف بلي 3 د الحجرات 3 د الغنم '
+                        B: 'واحد النهار واحد كيصرح الغنم بدا كيفكر وشاف بلي 3 د الحجرات 3 د الغنم '
+  prism_5        +0.0   A: 'ما بقاش كيشوف الغنم ولا كيشوف la quantite الكميه وتما تزادت l arithmet'
+                        B: 'ما بقاش كيشوف الغنم ولا كيشوف la quantite الكميه وتما تزادت l arithmet'
+  prism_6        +0.0   A: 'الروينه ديال irrational البيطاغوريين كان حساب لهم بلي العالم مفصل غير '
+                        B: 'الروينه ديال irrational البيطاغوريين كان حساب لهم بلي العالم مفصل غير '
+  prism_7        +0.0   A: 'تالي واحد النهار جاو يحسبو الضلع ديال واحد المربع بسيط كاغي وخرج لهم غ'
+                        B: 'تالي واحد النهار جاو يحسبو الضلع ديال واحد المربع بسيط كاغي وخرج لهم غ'
+  prism_8        +0.0   A: 'هادي كانت صدمه في السيستيم ديالهم لدرجه الاسطوره كتقول بلي قتلو هاداك '
+                        B: 'هادي كانت صدمه في السيستيم ديالهم لدرجه الاسطوره كتقول بلي قتلو هاداك '
+=== vLLM  vs  Transformers : 466 échantillons en commun
+Prism   transcriptions identiques : 213/357 (59.7 %)   CER vLLM = 9.03 %   CER Transformers = 8.98 %   écart = -0.04 pt
+Probe   transcriptions identiques : 84/109 (77.1 %)   CER vLLM = 13.42 %   CER Transformers = 12.17 %   écart = -1.25 pt
+
+Plus grands écarts par échantillon (CER B - CER A, en points) :
+  probe_66      -29.9   A: 'خاصنا نرجعو البيبلاين كامل ديبلويمنت سكان سيكوريتي البيلد تشيكاوت اليف'
+                        B: 'today خاصنا نرجعو ال pipeline كامل ال deployment ال scan ال security ا'
+  probe_97      -19.7   A: 'هاد الموسم لاغيكورد كانت مزيانه بصح لبري ديال السمك طلع بزاف'
+                        B: 'هاد الموسم la record كانت مزيانه بصح ال prix ديال السمك طلع بزاف'
+  prism_145     +14.0   A: 'هندسه العمليات est une des procedures qui s est a l interieur من مراحل'
+                        B: 'هندسه العمليات est une des procedures qui s est a l interieur de la ma'
+  probe_112     +13.1   A: 'خاصني يمشي l administration ندير une demande ديال passeport جديد وقالو'
+                        B: 'خاصني نمشي لادمنيستراتيون ندير une demande ديال passeport جديد وقالو ل'
+  prism_122     -13.1   A: 'هندسه الاتصالات لوجيني تيليكوم كتهتم بنقل المعلومات عبر الاقمار الاصطن'
+                        B: 'هندسه الاتصالات لوجيني تيليكوم كتهتم بنقل المعلومات عبر الاقمار الاصطن'
+  probe_17      -12.8   A: 'البارح جربت واحد الموبايل اب جديده لانترفاس ديالها simple ولكن ال logi'
+                        B: 'البارح جربت واحد mobile app جديده لانترفاس ديالها simple ولكن login pr'
+  prism_81      -12.1   A: 'جهاز العصبي و السيستيم العصبي يتكون الدماغ و النخاع سيطور الاعصاب كيصل'
+                        B: 'جهاز العصبي le systeme nerveux يتكون من الدماغ و النخاع surtout الاعصا'
+  prism_156     +12.0   A: 'حضاره بلاد الرافدين ميزوبوتامي هي لي اختارت اول كتابه في العالم الكتاب'
+                        B: 'حضاره بلاد الرافدين ميزوبوتامي هي لي اختارت اول كتابه في العالم الكتاب'
+Prism  n=357  CER=9.03 %  (5133 erreurs / 56870 caractères)  WER=17.43 %  (1740 / 9983 mots)
+Probe  n=109  CER=13.42 %  (1396 erreurs / 10406 caractères)  WER=23.27 %  (453 / 1947 mots)
+Différences entre la normalisation refaite et celle du fichier : 0
+Prism  n=357  CER=8.98 %  (5109 erreurs / 56870 caractères)  WER=17.41 %  (1738 / 9983 mots)
+Probe  n=109  CER=12.17 %  (1266 erreurs / 10406 caractères)  WER=21.83 %  (425 / 1947 mots)
+Différences entre la normalisation refaite et celle du fichier : 0
+=== Délai et format chargés par vLLM
+(EngineCore pid=449548) INFO 11-12 23:08:11 [core.py:139] Initializing a V1 LLM engine (v0.33.0) with config: model='/home/skiredj.abderrahman/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic', speculative_config=None, tokenizer='/home/skiredj.abderrahman/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.bfloat16, max_seq_len=131072, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=False, quantization=None, quantization_config=None, enforce_eager=True, aux_output_config=AuxOutputConfig(enable_return_routed_experts=False, max_bytes=None), kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, per_request_spec_decode_metrics='none', kv_cache_metrics=False, kv_cache_metrics_sample=0.01, custom_histogram_buckets=None, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False, jit_monitor_mode='warn', jit_monitor_verbose=False), seed=0, served_model_name=Morocco-MITNRA-Labs/Voxtral-Mini-4B-Realtime-Arabic, enable_prefix_caching=True, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.NONE: 0>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'inductor', 'custom_ops': ['all'], 'ir_enable_torch_wrap': False, 'splitting_ops': [], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'cudagraph_decoder_replay': True, 'decoder_replay_cudagraph_capture_sizes': [], 'decoder_replay_trim_threshold': 768, 'compile_sizes': [], 'compile_ranges_endpoints': [2048], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.NONE: 0>, 'cudagraph_num_of_warmups': 0, 'cudagraph_capture_sizes': [], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': True, 'fuse_act_quant': True, 'fuse_attn_quant': False, 'fuse_allreduce_rms': False, 'enable_qk_norm_rope_fusion': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False, 'fuse_qk_norm_rope_kvcache': False}, 'max_cudagraph_capture_size': 0, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': False, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['vllm_c', 'native'], fused_add_rms_norm=['vllm_c', 'native'], gelu_and_mul_sparse=['triton', 'native']), enable_flashinfer_autotune=True, enable_rocm_segmented_attn_autotune=False, enable_cutedsl_warmup=True, enable_jit_warmup=False, monokernel=False, moe_backend='auto', sparse_indexer_topk_backend='auto', linear_backend='auto', linear_backend_per_quant=None)
+(APIServer pid=457240) INFO 11-13 01:00:35 [startup.py:96] non-default args: {'model_tag': '/home/skiredj.abderrahman/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic', 'port': 8169, 'model': '/home/skiredj.abderrahman/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic', 'tokenizer_mode': 'mistral', 'enforce_eager': True, 'served_model_name': ['Morocco-MITNRA-Labs/Voxtral-Mini-4B-Realtime-Arabic'], 'config_format': 'mistral', 'override_generation_config': {'temperature': 0.0}, 'load_format': 'mistral'}
+(EngineCore pid=457382) INFO 11-13 01:00:48 [core.py:139] Initializing a V1 LLM engine (v0.33.0) with config: model='/home/skiredj.abderrahman/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic', speculative_config=None, tokenizer='/home/skiredj.abderrahman/voxtral-darija/Voxtral-Mini-4B-Realtime-Arabic', skip_tokenizer_init=False, tokenizer_mode=mistral, revision=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.bfloat16, max_seq_len=131072, download_dir=None, load_format=mistral, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=False, quantization=None, quantization_config=None, enforce_eager=True, aux_output_config=AuxOutputConfig(enable_return_routed_experts=False, max_bytes=None), kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, per_request_spec_decode_metrics='none', kv_cache_metrics=False, kv_cache_metrics_sample=0.01, custom_histogram_buckets=None, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False, jit_monitor_mode='warn', jit_monitor_verbose=False), seed=0, served_model_name=Morocco-MITNRA-Labs/Voxtral-Mini-4B-Realtime-Arabic, enable_prefix_caching=True, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.NONE: 0>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'inductor', 'custom_ops': ['all'], 'ir_enable_torch_wrap': False, 'splitting_ops': [], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'cudagraph_decoder_replay': True, 'decoder_replay_cudagraph_capture_sizes': [], 'decoder_replay_trim_threshold': 768, 'compile_sizes': [], 'compile_ranges_endpoints': [2048], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.NONE: 0>, 'cudagraph_num_of_warmups': 0, 'cudagraph_capture_sizes': [], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': True, 'fuse_act_quant': True, 'fuse_attn_quant': False, 'fuse_allreduce_rms': False, 'enable_qk_norm_rope_fusion': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False, 'fuse_qk_norm_rope_kvcache': False}, 'max_cudagraph_capture_size': 0, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': False, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['vllm_c', 'native'], fused_add_rms_norm=['vllm_c', 'native'], gelu_and_mul_sparse=['triton', 'native']), enable_flashinfer_autotune=True, enable_rocm_segmented_attn_autotune=False, enable_cutedsl_warmup=True, enable_jit_warmup=False, monokernel=False, moe_backend='auto', sparse_indexer_topk_backend='auto', linear_backend='auto', linear_backend_per_quant=None)
