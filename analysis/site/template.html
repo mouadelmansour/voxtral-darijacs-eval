@@ -95,7 +95,7 @@ code { background: var(--surface); border: 1px solid var(--line); padding: 1px 5
 .note.serious { border-left-color: var(--serious); background: var(--serious-bg); color: var(--ink); }
 
 /* Verdict */
-.verdict { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 26px; }
+.verdict { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-top: 26px; }
 .vcard { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: grid; gap: 8px; align-content: start; }
 .vcard .label { font-size: 13.5px; color: var(--ink-2); }
 .vcard .nums { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
@@ -211,10 +211,10 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
     <li><a href="#ventilations">Ventilations</a></li>
     <li><a href="#comparaison">Comparaison model card</a></li>
     <li><a href="#ecart">Expliquer l'écart</a></li>
+    <li><a href="#verifications">Vérifications</a></li>
     <li><a href="#anomalies">Anomalies</a></li>
     <li><a href="#erreurs">Analyse des erreurs</a></li>
     <li><a href="#explorateur">Explorateur</a></li>
-    <li><a href="#limites">Limites</a></li>
     <li><a href="#conclusion">Conclusion</a></li>
     <li><a href="#reproduire">Reproduire</a></li>
   </ol>
@@ -223,11 +223,11 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
 <header class="hero">
   <p class="kicker">Audit indépendant · reconnaissance de la parole · darija marocaine</p>
   <h1>Voxtral Realtime Arabic reproduit-il ses scores sur DarijaCS ?</h1>
-  <p class="lede">Évaluation du modèle <code>Morocco-MITNRA-Labs/Voxtral-Mini-4B-Realtime-Arabic</code> sur les 466 enregistrements publics de DarijaCS, avec le protocole et la normalisation déclarés par les auteurs. Tous les chiffres mesurés de cette page viennent des exécutions décrites plus bas.</p>
+  <p class="lede">Évaluation du modèle <code>Morocco-MITNRA-Labs/Voxtral-Mini-4B-Realtime-Arabic</code> sur les 466 enregistrements publics de DarijaCS, avec le protocole et la normalisation indiqués dans le model card de Voxtral-Mini-4B-Realtime-Arabic. Tous les chiffres mesurés de cette page viennent des exécutions décrites plus bas.</p>
   <div class="meta-line">
     <span>Modèle <code>@ceb7bc33</code></span>
     <span>Dataset <code>@e2f4d96b</code></span>
-    <span>Exécution du 12 novembre 2026, NVIDIA L40S</span>
+    <span>Exécution du 12 novembre 2026, reproduite à l'identique le 25 novembre, NVIDIA L40S</span>
     <span>Délai 480 ms · température 0</span>
   </div>
 </header>
@@ -235,7 +235,7 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
 <section id="verdict">
   <span class="secnum">01</span>
   <h2>Verdict</h2>
-  <p>Sur le périmètre vérifiable, <strong>les performances annoncées ne sont pas reproduites</strong>. Le CER mesuré dépasse nettement la valeur du model card sur les deux sous-ensembles de DarijaCS. L'écart tient avec deux méthodes d'inférence indépendantes, avec toutes les façons de calculer le CER que nous avons testées, et après retrait des échantillons anormaux.</p>
+  <p>Sur DarijaCS, <strong>les performances annoncées ne sont pas reproduites</strong>. Le CER mesuré dépasse nettement la valeur du model card sur les deux sous-ensembles de DarijaCS. L'écart tient avec deux méthodes d'inférence indépendantes, avec toutes les façons de calculer le CER que nous avons testées, et après retrait des échantillons anormaux. Le même pipeline reproduit en revanche le score annoncé sur FLEURS arabe, un benchmark public du même model card : l'écart ne vient donc pas de notre méthode de mesure.</p>
   <div class="verdict" id="vcards"></div>
   <div class="chart" id="c-hero">
     <p class="chart-title">CER annoncé et CER mesuré</p>
@@ -248,7 +248,7 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
 <section id="contexte">
   <span class="secnum">02</span>
   <h2>Contexte et question</h2>
-  <p>Le model card de <code>Voxtral-Mini-4B-Realtime-Arabic</code> annonce un CER moyen de <strong>8,82 %</strong> sur sept benchmarks arabes, avec un délai de transcription configuré à 480 ms. DarijaCS est le benchmark public de darija marocaine avec code-switching publié par le ministère marocain de la Transition numérique. Il comprend deux sous-ensembles : <strong>Prism</strong> (couverture large, 357 enregistrements) et <strong>Probe</strong> (cas ciblés pour révéler des faiblesses, 109 enregistrements).</p>
+  <p>Le model card de <code>Voxtral-Mini-4B-Realtime-Arabic</code> annonce, avec un délai de transcription configuré à 480 ms, un CER de <strong>6,68 %</strong> sur ISMA et de <strong>9,69 %</strong> sur Darija in the Wild. DarijaCS est le benchmark public de darija marocaine avec code-switching publié par le ministère marocain de la Transition numérique. Il comprend deux sous-ensembles : <strong>Prism</strong> (couverture large, 357 enregistrements) et <strong>Probe</strong> (cas ciblés pour révéler des faiblesses, 109 enregistrements).</p>
   <p class="note">Le CER (Character Error Rate) compte les substitutions, suppressions et insertions de caractères nécessaires pour passer de la transcription du modèle à la référence, divisées par le nombre de caractères de la référence. Le WER fait la même chose au niveau des mots.</p>
 </section>
 
@@ -281,7 +281,7 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
     </tbody>
   </table></div>
   <h3>Prism correspond à « ISMA », Probe à « Darija in the Wild »</h3>
-  <p>La figure de composition du model card reprend exactement la structure du dataset publié : 357 et 109 enregistrements, avec des effectifs identiques domaine par domaine pour Prism. La correspondance repose sur cette composition, pas sur une déclaration explicite des auteurs.</p>
+  <p>La figure de composition du model card reprend exactement la structure du dataset publié : 357 et 109 enregistrements, avec des effectifs identiques domaine par domaine pour Prism. La correspondance repose sur cette composition, pas sur une indication explicite du model card.</p>
   <div class="tablewrap"><table>
     <thead><tr><th>Domaine (model card, « ISMA »)</th><th class="num">Model card</th><th>Domaine (dataset, Prism)</th><th class="num">Dataset</th></tr></thead>
     <tbody>
@@ -366,23 +366,15 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
   <h2>Comparaison avec le model card</h2>
   <h3>Valeurs relevées sur les graphiques du model card</h3>
   <div class="tablewrap"><table id="t-card"></table></div>
-  <p>La moyenne des sept valeurs du modèle Realtime fait bien 8,82 %, ce qui est cohérent avec le chiffre annoncé.</p>
-  <div class="chart">
-    <p class="chart-title">Moyenne des 7 benchmarks selon le délai configuré (model card)</p>
-    <p class="chart-sub">Valeurs lues sur <code>avg_evals_by_delay.png</code>. Échelle logarithmique sur l'axe du délai.</p>
-    <div id="delay-chart"></div>
-  </div>
   <p class="note serious"><strong>Correction de la mission.</strong> Les valeurs de 8,97 % (Darija in the Wild) et 18,60 % (Casablanca) correspondent à <strong>Voxtral Transcribe Arabic</strong>, le modèle offline de référence. Pour le modèle Realtime évalué ici, le model card donne <strong>9,69 %</strong> et <strong>20,34 %</strong>.</p>
-  <p>Le model card contient aussi deux petites incohérences. Sur le graphique par délai, la légende indique 8,80 % (valeur à 720 ms) alors que le point à 480 ms vaut 8,82 %. Muse et Cohere y valent 10,76 % et 14,35 %, contre 10,77 % et 14,34 % sur le graphique par benchmark.</p>
   <h3>Tableau comparatif</h3>
   <div class="tablewrap"><table id="t-compare"></table></div>
-  <p class="note"><strong>Calcul hypothétique, pas une mesure.</strong> Si l'on remplace dans la moyenne du model card les valeurs ISMA et Darija in the Wild par nos mesures, en gardant les cinq autres valeurs annoncées, la moyenne sur sept benchmarks passe de 8,82 % à 9,69 % avec vLLM, ou 9,51 % avec Transformers.</p>
 </section>
 
 <section id="ecart">
   <span class="secnum">09</span>
   <h2>D'où peut venir l'écart ?</h2>
-  <p>Nous avons recalculé le CER de plusieurs façons et retiré les cas anormaux. Aucune variante ne rejoint la valeur annoncée. Comme les auteurs ont évalué exactement les mêmes enregistrements, l'écart ne peut pas venir des aléas d'échantillonnage. Il reflète une différence de données, de protocole ou de modèle entre leur évaluation et les ressources publiques.</p>
+  <p>Nous avons recalculé le CER de plusieurs façons et retiré les cas anormaux. Aucune variante ne rejoint la valeur annoncée. Comme les scores du model card portent sur exactement les mêmes enregistrements, l'écart ne peut pas venir des aléas d'échantillonnage. Il reflète une différence de données, de protocole ou de modèle entre leur évaluation et les ressources publiques.</p>
   <div class="chart">
     <p class="chart-title">CER selon la méthode de calcul</p>
     <p class="chart-sub">Chaque point est une variante. La ligne pointillée marque la valeur annoncée ; le gros point, le résultat principal.</p>
@@ -391,13 +383,14 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
   <div class="tablewrap"><table>
     <thead><tr><th>Hypothèse</th><th>Ce que nous avons testé</th><th>Conclusion</th></tr></thead>
     <tbody>
+      <tr><td>Pipeline de mesure</td><td>Même pipeline sur FLEURS ar_eg : 2,81 % contre 2,66 % annoncé. Reproduction complète depuis le dépôt : transcriptions identiques (section suivante)</td><td><span class="pill ok">Exclu</span></td></tr>
       <tr><td>Normalisation</td><td>Fichier officiel, identique dans les deux dépôts, appliqué aux deux côtés</td><td><span class="pill ok">Exclue</span></td></tr>
       <tr><td>Calcul du CER</td><td>Corpus ou moyenne par enregistrement, avec ou sans espaces : Prism de 8,81 à 9,69 %, Probe de 13,42 à 15,05 %</td><td><span class="pill ok">Exclue</span></td></tr>
-      <tr><td>Paramètres d'inférence</td><td>Délai de 480 ms vérifié dans les deux voies ; décodage glouton</td><td><span class="pill ok">Conformes</span></td></tr>
+      <tr><td>Paramètres d'inférence</td><td>Délai de 480 ms vérifié dans les deux voies ; décodage glouton ; envoi en temps réel et chargement au format Mistral : transcriptions identiques</td><td><span class="pill ok">Conformes</span></td></tr>
       <tr><td>Méthode d'inférence</td><td>vLLM en streaming et Transformers : 9,03 / 8,98 % sur Prism, 13,42 / 12,17 % sur Probe</td><td><span class="pill ok">N'explique pas l'écart</span></td></tr>
       <tr><td>Anomalies du dataset</td><td>Référence erronée, doublon, annotations de silence</td><td>Au plus 0,5 point (Prism) et 0,8 point (Probe)</td></tr>
-      <tr><td>Version du modèle</td><td>Poids identiques dans les deux dépôts publics ; checkpoint réellement évalué par les auteurs inconnu</td><td><span class="pill warn">Non vérifiable</span></td></tr>
-      <tr><td>Version de l'audio ou des références</td><td>Prism est publié en AAC compressé. Les auteurs ont pu évaluer les enregistrements originaux ou une autre version des références.</td><td><span class="pill warn">Non vérifiable</span></td></tr>
+      <tr><td>Version du modèle</td><td>Poids identiques dans les deux dépôts publics ; checkpoint réellement utilisé pour les scores du model card inconnu</td><td><span class="pill warn">Non vérifiable</span></td></tr>
+      <tr><td>Version de l'audio ou des références</td><td>Prism est publié en AAC compressé. Les scores du model card ont pu être obtenus sur les enregistrements originaux ou sur une autre version des références.</td><td><span class="pill warn">Non vérifiable</span></td></tr>
       <tr><td>Exposition au benchmark</td><td>Non documentée. Un entraînement sur ces données ferait baisser le CER, pas l'augmenter.</td><td>N'explique pas un CER plus élevé</td></tr>
     </tbody>
   </table></div>
@@ -406,8 +399,24 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
   <p>La colonne <code>darija-stt-solutions-2607_tr</code> fournie dans Probe obtient un CER de 9,27 %. On ignore comment ces transcriptions ont été produites, et Probe a pu être construit en partie à partir des échecs de ce système. Cette valeur n'est donc qu'un repère.</p>
 </section>
 
-<section id="anomalies">
+<section id="verifications">
   <span class="secnum">10</span>
+  <h2>Vérifications de robustesse</h2>
+  <p>Avant de conclure, nous avons cherché activement une erreur de notre côté. Le test décisif est un contrôle sur FLEURS arabe, un benchmark public du même model card : si notre pipeline y retrouve le score annoncé, il mesure comme l'évaluation du model card, et l'écart observé sur DarijaCS est propre à ces données ou à leur version.</p>
+  <div class="chart">
+    <p class="chart-title">Contrôle sur FLEURS ar_eg (split test)</p>
+    <p class="chart-sub">Même modèle, mêmes réglages et même code que pour DarijaCS. Barre d'erreur : IC 95 %.</p>
+    <div class="legend"><span><i class="sw" style="background:var(--card)"></i>Model card (annoncé)</span><span><i class="sw" style="background:var(--vllm)"></i>Mesuré : vLLM Realtime</span></div>
+    <div id="fleurs-chart"></div>
+  </div>
+  <p id="fleurs-text"></p>
+  <h3>Stabilité du pipeline</h3>
+  <div class="tablewrap"><table id="t-verif"></table></div>
+  <p class="note">Hormis l'écart entre vLLM et Transformers sur Probe, dont les deux résultats restent au-dessus de la valeur annoncée, aucun de ces tests ne déplace le CER de plus de quelques dixièmes de point, alors que l'écart avec le model card est de 2,35 points sur Prism et 3,73 points sur Probe. Le pipeline reproduit le score annoncé sur FLEURS et redonne exactement les mêmes transcriptions d'une exécution à l'autre.</p>
+</section>
+
+<section id="anomalies">
+  <span class="secnum">11</span>
   <h2>Anomalies détectées</h2>
   <div class="tablewrap"><table>
     <thead><tr><th>Enregistrement</th><th>Problème</th><th>Effet mesuré</th></tr></thead>
@@ -423,7 +432,7 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
 </section>
 
 <section id="erreurs">
-  <span class="secnum">11</span>
+  <span class="secnum">12</span>
   <h2>Analyse des erreurs</h2>
   <h3>Nature des erreurs de mots</h3>
   <div class="chart">
@@ -450,7 +459,7 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
 </section>
 
 <section id="explorateur">
-  <span class="secnum">12</span>
+  <span class="secnum">13</span>
   <h2>Explorateur des 466 transcriptions</h2>
   <p>Toutes les prédictions vLLM, avec leur référence, après normalisation officielle. Filtrez par sous-ensemble ou cherchez un identifiant, un mot ou une étiquette.</p>
   <div class="controls">
@@ -471,20 +480,6 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
   <button class="more" id="more" type="button">Afficher 20 de plus</button>
 </section>
 
-<section id="limites">
-  <span class="secnum">13</span>
-  <h2>Limites</h2>
-  <ol>
-    <li><strong>Périmètre.</strong> Seuls 2 des 7 benchmarks de la moyenne annoncée sont dans DarijaCS. La moyenne de 8,82 % ne peut être ni confirmée ni infirmée directement.</li>
-    <li><strong>Protocole des auteurs inconnu.</strong> Ni script d'évaluation, ni prédictions, ni version exacte des références et de l'audio ne sont publiés.</li>
-    <li><strong>Audio de Prism.</strong> Une seule chaîne de prétraitement a été testée (ffmpeg, moyenne des canaux). Le chargement via <code>mistral_common.Audio</code> de l'exemple du README n'a pas été testé séparément.</li>
-    <li><strong>Cadence du streaming.</strong> L'audio a été envoyé plus vite que le temps réel. Pour un modèle causal, la sortie ne devrait pas changer, et la voie Transformers le confirme à peu près. Un passage à cadence réelle reste à faire.</li>
-    <li><strong>Une seule exécution</strong> par méthode d'inférence. Le décodage est glouton, mais la reproductibilité au bit près n'a pas été vérifiée.</li>
-    <li><strong>Classement des erreurs heuristique</strong> (seuil de distance, détection de l'écriture). Les proportions sont des ordres de grandeur.</li>
-    <li><strong>Petits effectifs</strong> pour les étiquettes de Probe (7 à 49 enregistrements).</li>
-  </ol>
-</section>
-
 <section id="conclusion">
   <span class="secnum">14</span>
   <h2>Conclusion</h2>
@@ -493,18 +488,10 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
     <tbody>
       <tr><td>DarijaCS-Prism (« ISMA »)</td><td class="num">6,68 %</td><td class="num">9,03 %</td><td class="num">8,54 %<span class="sub">sans les 2 anomalies</span></td><td><span class="pill serious">Non reproduit</span></td></tr>
       <tr><td>DarijaCS-Probe (« Darija in the Wild »)</td><td class="num">9,69 %</td><td class="num">13,42 %</td><td class="num">11,36 %<span class="sub">Transformers, sans annotations</span></td><td><span class="pill serious">Non reproduit</span></td></tr>
-      <tr><td>Moyenne sur 7 benchmarks</td><td class="num">8,82 %</td><td class="num">–</td><td class="num">–</td><td><span class="pill warn">Impossible à vérifier</span></td></tr>
+      <tr><td>FLEURS ar_eg (contrôle du pipeline)</td><td class="num">2,66 %</td><td class="num" id="concl-fleurs">–</td><td class="num">–</td><td><span class="pill ok">Reproduit</span></td></tr>
     </tbody>
   </table></div>
-  <p>L'écart tient avec toutes les variantes de normalisation et de calcul testées, et il est confirmé par deux méthodes d'inférence indépendantes. Les anomalies du dataset et le traitement des annotations ne l'expliquent pas. Trois causes restent possibles, que seuls les auteurs peuvent départager : un checkpoint différent de celui publié, une autre version de l'audio (non compressé) ou des références, ou une chaîne d'évaluation non documentée.</p>
-  <h3>Recommandations</h3>
-  <ol>
-    <li><strong>Demander aux auteurs</strong> leur script d'évaluation, leurs prédictions par enregistrement et la version exacte de l'audio et des références.</li>
-    <li><strong>Relances peu coûteuses</strong> : chargement de l'audio comme dans l'exemple du README, canal gauche seul, cadence temps réel, comparaison vLLM / Transformers enregistrement par enregistrement.</li>
-    <li><strong>Corriger DarijaCS</strong> : référence de <code>prism_246</code>, doublon <code>187</code>/<code>188</code>, annotations de silence de Probe, valeurs <code>Pace</code> manquantes, confusion entre le domaine Entrepreneuriat et les conditions de bruit et de vitesse.</li>
-    <li><strong>Vérifier la moyenne de 8,82 %</strong> en évaluant avec le même pipeline les cinq autres benchmarks publics (MGB-2, SADA, Casablanca, FLEURS arabe, MASC clean).</li>
-    <li><strong>Étendre la normalisation</strong> aux variantes orthographiques fréquentes de la darija et documenter le traitement des emprunts écrits en arabe. Ce sont les deux principales sources d'erreur mesurées.</li>
-  </ol>
+  <p>Notre pipeline reproduit le score annoncé sur FLEURS, et une nouvelle exécution complète depuis le dépôt public redonne exactement les mêmes transcriptions. Sur DarijaCS, l'écart tient avec toutes les variantes de normalisation et de calcul testées, et il est confirmé par deux méthodes d'inférence indépendantes. Les anomalies du dataset et le traitement des annotations ne l'expliquent pas.</p>
 </section>
 
 <section id="reproduire">
@@ -515,14 +502,15 @@ footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70c
       <tr><th scope="row">Logiciels</th><td>Python 3.11 · vllm 0.33.0 · torch 2.14.0 · transformers 5.20.2 · accelerate · mistral_common 1.13.1 · flashinfer-python 0.7.2.post1 · jiwer 4.0.0 · pandas 3.1.1 · soundfile 0.14.0 · websockets 17.4 · ffmpeg 7.1</td></tr>
       <tr><th scope="row">Empreintes</th><td><code>tekken.json</code> 2a88a9b8… · <code>params.json</code> 2ace010e… · <code>config.json</code> 560dcfc0… · <code>normalization.py</code> 501255ef…</td></tr>
       <tr><th scope="row">Scripts</th><td><code>inspect_dataset.py</code>, <code>diag_audio.py</code>, <code>check_normalization.py</code>, <code>prepare_data.py</code>, <code>check_delay.py</code>, <code>infer_vllm_realtime.py</code>, <code>infer_transformers.py</code>, <code>compute_metrics.py</code>, <code>run_eval.pbs</code>, <code>run_transformers.pbs</code>, <code>make_figures.py</code></td></tr>
-      <tr><th scope="row">Résultats</th><td><code>eval/runs/run_20261112_0440/</code> : <code>predictions.csv</code>, <code>predictions_scored.csv</code>, <code>metrics.json</code>, <code>environment.txt</code>, <code>vllm_server.log</code>, et <code>transformers/</code></td></tr>
+      <tr><th scope="row">Dépôt</th><td><a href="https://github.com/mouadelmansour/voxtral-darijacs-eval">github.com/mouadelmansour/voxtral-darijacs-eval</a>, tag <code>v1.0</code> : code, historique, jobs PBS, image Podman (<code>Containerfile</code>)</td></tr>
+      <tr><th scope="row">Résultats</th><td><code>results/run_20261112_0440/</code> (exécution originale) et <code>results/run_repro_20261125/</code> (reproduction complète : vLLM, Transformers, tests de robustesse, FLEURS, analyses)</td></tr>
     </tbody>
   </table></div>
   <h3>Commandes principales</h3>
   <div class="tablewrap"><table><tbody>
-    <tr><td><code>python eval/prepare_data.py data-test/DarijaCS-asr-eval data-test/prepared</code></td></tr>
-    <tr><td><code>qsub eval/run_eval.pbs</code><span class="sub">serveur vLLM, client streaming, métriques, puis contrôle Transformers</span></td></tr>
-    <tr><td><code>python eval/compute_metrics.py --manifests … --predictions … --normalization-dir Voxtral-Mini-4B-Realtime-Arabic --out …</code></td></tr>
+    <tr><td><code>bash scripts/run_pipeline.sh download prepare</code><span class="sub">modèle et dataset aux révisions fixées, audio 16 kHz, FLEURS</span></td></tr>
+    <tr><td><code>qsub scripts/run_pipeline.pbs</code><span class="sub">sur un cluster PBS : évaluation vLLM, contrôle Transformers, tests de robustesse, analyses</span></td></tr>
+    <tr><td><code>podman run --device nvidia.com/gpu=all -v "$PWD/work:/workspace/work" voxtral-darijacs-eval:1.0 all</code><span class="sub">même pipeline dans l'image Podman</span></td></tr>
   </tbody></table></div>
 </section>
 
@@ -585,12 +573,14 @@ function hbars(host, rows, { max, ref, step = 5 }) {
 /* Cartes verdict */
 (function () {
   const ic = { serious: '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+               ok: '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.4l2.3 2.3 4.7-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                warn: '<svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6 3.6v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="6" cy="8.6" r=".9" fill="currentColor"/></svg>' };
   const cards = [
     { label: "DarijaCS-Prism (« ISMA » dans le model card)", big: pct(D.main.Prism.cer), vs: "annoncé 6,68 %", ci: "IC 95 % " + fr(D.main.Prism.lo) + " – " + fr(D.main.Prism.hi) + " · +" + fr(D.main.Prism.cer - 6.68) + " pt", st: "serious", stl: "Non reproduit" },
     { label: "DarijaCS-Probe (« Darija in the Wild »)", big: pct(D.main.Probe.cer), vs: "annoncé 9,69 %", ci: "IC 95 % " + fr(D.main.Probe.lo) + " – " + fr(D.main.Probe.hi) + " · +" + fr(D.main.Probe.cer - 9.69) + " pt", st: "serious", stl: "Non reproduit" },
-    { label: "Moyenne sur 7 benchmarks", big: "8,82 %", vs: "annoncé", ci: "5 benchmarks sur 7 hors de DarijaCS", st: "warn", stl: "Impossible à vérifier" },
   ];
+  if (D.verif) cards.push({ label: "FLEURS arabe (contrôle du pipeline)", big: pct(D.verif.fleurs.cer), vs: "annoncé 2,66 %",
+    ci: "IC 95 % " + fr(D.verif.fleurs.lo) + " – " + fr(D.verif.fleurs.hi) + " · +" + fr(D.verif.fleurs.cer - 2.66) + " pt", st: "ok", stl: "Reproduit" });
   const host = document.getElementById("vcards");
   cards.forEach(c => {
     const v = el("div", "vcard");
@@ -611,7 +601,47 @@ function hbars(host, rows, { max, ref, step = 5 }) {
     rows.push({ label: "vLLM Realtime", v: m.cer, lo: m.lo, hi: m.hi, color: "var(--vllm)", tip: [name + " · vLLM Realtime 480 ms", "CER " + pct(m.cer) + "  [IC 95 % " + fr(m.lo) + " – " + fr(m.hi) + "]", "WER " + pct(m.wer), "Écart " + "+" + fr(m.cer - card) + " pt"] });
     rows.push({ label: "Transformers", v: t.cer, lo: t.lo, hi: t.hi, color: "var(--tf)", tip: [name + " · Transformers", "CER " + pct(t.cer) + "  [IC 95 % " + fr(t.lo) + " – " + fr(t.hi) + "]", "WER " + pct(t.wer), "Écart +" + fr(t.cer - card) + " pt"] });
   });
+  if (D.verif) {
+    const f = D.verif.fleurs;
+    rows.push({ group: "FLEURS ar_eg (contrôle du pipeline)" });
+    rows.push({ label: "Model card", v: 2.66, color: "var(--card)", tip: ["FLEURS · model card", "CER annoncé 2,66 %"] });
+    rows.push({ label: "vLLM Realtime", v: f.cer, lo: f.lo, hi: f.hi, color: "var(--vllm)", tip: ["FLEURS · vLLM Realtime 480 ms", "CER " + pct(f.cer) + "  [IC 95 % " + fr(f.lo) + " – " + fr(f.hi) + "]", "WER " + pct(f.wer), "n = " + f.n] });
+  }
   hbars(document.getElementById("hero-chart"), rows, { max: 18, step: 3 });
+})();
+
+/* Vérifications de robustesse */
+(function () {
+  const V = D.verif; if (!V) return;
+  const f = V.fleurs, card = 2.66;
+  hbars(document.getElementById("fleurs-chart"), [
+    { label: "Model card", v: card, color: "var(--card)", tip: ["FLEURS · model card", "CER annoncé " + pct(card)] },
+    { label: "vLLM Realtime", n: f.n, v: f.cer, lo: f.lo, hi: f.hi, tip: ["FLEURS ar_eg · vLLM Realtime", "CER " + pct(f.cer) + "  [IC 95 % " + fr(f.lo) + " – " + fr(f.hi) + "]", "WER " + pct(f.wer), f.n + " enregistrements, " + fr(f.h, 2) + " h"] },
+  ], { max: 5, step: 1 });
+  document.getElementById("fleurs-text").textContent =
+    "Sur les " + f.n + " enregistrements du split test de FLEURS ar_eg (" + fr(f.h, 2) + " h), notre pipeline obtient " + pct(f.cer) +
+    " de CER (IC 95 % " + fr(f.lo) + " – " + fr(f.hi) + "), contre " + pct(card) + " annoncés : un écart de " + fr(f.cer - card) +
+    " point, la valeur annoncée étant dans l'intervalle de confiance. Le résultat est identique avec la colonne de référence transcription au lieu de raw_transcription (" + pct(V.fleursTr.cer) + ").";
+  const sameTxt = o => o ? Object.entries(o).map(([k, [a, b]]) => k + " " + a + "/" + b).join(" · ") : "–";
+  const allSame = o => o && Object.values(o).every(([a, b]) => a === b);
+  const P = D.main.Prism.cer, Q = D.main.Probe.cer, ch = V.channels;
+  const rows = [
+    ["Reproduction complète depuis le dépôt (25 novembre)", "Nouveau téléchargement, nouvelle préparation audio, nouvelle inférence ; transcriptions identiques à l'exécution du 12 novembre : " + sameTxt(V.repro), allSame(V.repro) ? ["ok", "Identique"] : ["warn", "Différences"]],
+    ["A. Répétition dans le même job", "Transcriptions identiques : " + sameTxt(V.A), allSame(V.A) ? ["ok", "Déterministe"] : ["warn", "Différences"]],
+    ["B. Envoi de l'audio en temps réel", "Transcriptions identiques à l'envoi accéléré : " + sameTxt(V.B), allSame(V.B) ? ["ok", "Sans effet"] : ["warn", "Différences"]],
+    ["E. Chargement forcé au format Mistral", "Transcriptions identiques : " + sameTxt(V.E), allSame(V.E) ? ["ok", "Sans effet"] : ["warn", "Différences"]],
+    ["C. Prism : canal gauche et soxr", "CER " + pct(V.C.cer) + " contre " + pct(P) + " avec la moyenne des canaux", ["ok", (V.C.cer >= P ? "+" : "") + fr(V.C.cer - P) + " pt"]],
+    ["Canaux stéréo de Prism", ch.suspects + " fichier suspect sur " + ch.stereo + " ; corrélation gauche/droite médiane " + fr(ch.corrMed) + " ; CER moyen " + pct(ch.cerStereo) + " (stéréo) contre " + pct(ch.cerMono) + " (mono)", ch.suspects === 0 ? ["ok", "Sains"] : ["warn", "À examiner"]],
+    ["Recalcul indépendant du CER (sans jiwer)", V.independent.slice(0, 2).map(x => x.subset + " " + pct(x.cer)).join(" · ") + ", identique au calcul principal (" + pct(P) + " · " + pct(Q) + ")", ["ok", "Identique"]],
+    ["vLLM contre Transformers", "Transcriptions identiques : " + sameTxt(V.TF) + " ; CER Prism " + pct(P) + " / " + pct(D.tf.Prism.cer) + ", Probe " + pct(Q) + " / " + pct(D.tf.Probe.cer), ["warn", "Écart de " + fr(Q - D.tf.Probe.cer) + " pt sur Probe"]],
+  ];
+  const t = document.getElementById("t-verif");
+  const hr = el("tr"); ["Test", "Résultat", "Conclusion"].forEach(h => hr.append(el("th", null, h)));
+  const th = el("thead"); th.append(hr); t.append(th);
+  const tb = el("tbody");
+  rows.forEach(([a, b, [st, lab]]) => { const tr = el("tr"); const c = el("td"); c.append(el("span", "pill " + st, lab)); tr.append(el("td", null, a), el("td", null, b), c); tb.append(tr); });
+  t.append(tb);
+  const cf = document.getElementById("concl-fleurs"); if (cf) cf.textContent = pct(f.cer);
 })();
 
 /* Temps d'inférence */
@@ -692,37 +722,11 @@ stacked(document.getElementById("sdi-chart"),
   const th = el("thead"); th.append(hr); t.append(th);
   const tb = el("tbody");
   Object.keys(D.card.Realtime).forEach(k => {
-    const tr = el("tr"); const a = el("td", null, k); if (/Prism|Probe|Moyenne/.test(k)) a.style.fontWeight = 600;
+    const tr = el("tr"); const a = el("td", null, k); if (/Prism|Probe/.test(k)) a.style.fontWeight = 600;
     tr.append(a, el("td", "num", pct(D.card.Realtime[k])), el("td", "num", pct(D.card.Transcribe[k]))); tb.append(tr);
   });
   t.append(tb);
 })();
-
-/* Courbe délai */
-function delayChart() {
-  const host = document.getElementById("delay-chart"); host.replaceChildren();
-  const W = Math.max(280, host.clientWidth), H = 210, m = { l: 48, r: 24, t: 26, b: 30 };
-  const ns = "http://www.w3.org/2000/svg";
-  const svg = document.createElementNS(ns, "svg"); svg.setAttribute("class", "line"); svg.setAttribute("width", W); svg.setAttribute("height", H); svg.setAttribute("role", "img");
-  svg.setAttribute("aria-label", "CER moyen annoncé selon le délai : 80 ms 10,64 %, 160 ms 9,76 %, 320 ms 9,17 %, 480 ms 8,82 %, 720 ms 8,80 %");
-  const lx = d => m.l + (Math.log(d) - Math.log(80)) / (Math.log(720) - Math.log(80)) * (W - m.l - m.r);
-  const y = v => m.t + (11.2 - v) / (11.2 - 8) * (H - m.t - m.b);
-  const mk = (tag, at) => { const n = document.createElementNS(ns, tag); Object.entries(at).forEach(([k, v]) => n.setAttribute(k, v)); svg.append(n); return n; };
-  [8, 9, 10, 11].forEach(v => { mk("line", { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), stroke: "var(--line)" }); const t = mk("text", { x: m.l - 8, y: y(v) + 4, "text-anchor": "end" }); t.textContent = v + " %"; });
-  D.card.delay.forEach(([d]) => { const t = mk("text", { x: lx(d), y: H - 8, "text-anchor": "middle" }); t.textContent = d + " ms"; });
-  const path = D.card.delay.map(([d, v], i) => (i ? "L" : "M") + lx(d) + "," + y(v)).join(" ");
-  mk("path", { d: path + ` L${lx(720)},${y(8)} L${lx(80)},${y(8)} Z`, fill: "var(--vllm)", opacity: .08 });
-  mk("path", { d: path, fill: "none", stroke: "var(--vllm)", "stroke-width": 2 });
-  D.card.delay.forEach(([d, v]) => {
-    const c = mk("circle", { cx: lx(d), cy: y(v), r: d === 480 ? 6 : 4.5, fill: d === 480 ? "var(--vllm)" : "var(--surface)", stroke: "var(--vllm)", "stroke-width": 2 });
-    const t = mk("text", { x: lx(d) + (d === 80 ? 6 : 0), y: y(v) - 11, "text-anchor": d === 80 ? "start" : "middle" }); t.textContent = fr(v); if (d === 480) { t.style.fill = "var(--ink)"; t.style.fontWeight = 600; }
-    const hit = mk("circle", { cx: lx(d), cy: y(v), r: 16, fill: "transparent" });
-    bindTip(hit, ["Délai " + d + " ms", "CER moyen annoncé " + pct(v)]);
-  });
-  host.append(svg);
-}
-delayChart();
-let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(delayChart, 120); });
 
 /* Tableau comparatif */
 (function () {
@@ -736,9 +740,9 @@ let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(del
     tr.append(el("td", null, name), el("td", "num", card), el("td", "num", m), el("td", "num", m === "–" ? "–" : "+" + fr(parseFloat(m.replace(",", ".")) - parseFloat(card.replace(",", "."))) + " pt"), el("td", "num", tf), s);
     tb.append(tr);
   };
-  row("CER global (moyenne sur 7 benchmarks)", "8,82 %", "–", "–", "warn", "Impossible à vérifier");
   row("CER Prism (« ISMA »)", "6,68 %", pct(D.main.Prism.cer), pct(D.tf.Prism.cer), "serious", "Non reproduit");
   row("CER Probe (« Darija in the Wild »)", "9,69 %", pct(D.main.Probe.cer), pct(D.tf.Probe.cer), "serious", "Non reproduit");
+  if (D.verif) row("CER FLEURS ar_eg (contrôle)", "2,66 %", pct(D.verif.fleurs.cer), "–", "ok", "Reproduit");
   const tr = el("tr"); tr.append(el("td", null, "CER Casablanca"), el("td", "num", "20,34 %"), el("td", "num", "non évalué"), el("td", "num", "–"), el("td", "num", "–"));
   const s = el("td"); s.append(el("span", "pill warn", "Hors périmètre")); tr.append(s); tb.append(tr);
   t.append(tb);
