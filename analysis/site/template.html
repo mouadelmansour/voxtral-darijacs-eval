@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voxtral Realtime Arabic sur DarijaCS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+/* Plan : rapport d'audit technique. Colonne de lecture unique + sommaire latéral fixe sur grand écran.
+   Bleu = mesure vLLM (protocole principal), orange = contrôle Transformers, gris = valeur annoncée. */
+:root {
+  --bg: #f5f6f7;
+  --surface: #ffffff;
+  --ink: #15191d;
+  --ink-2: #4a525b;
+  --muted: #78808a;
+  --line: #e1e4e8;
+  --accent: #1d5fb0;
+  --vllm: #2a78d6;
+  --tf: #eb6834;
+  --card: #8f8d86;
+  --serious: #b4380d;
+  --serious-bg: #fbe9e2;
+  --warn: #8a5a00;
+  --warn-bg: #fbf0d9;
+  --ok: #18733f;
+  --del-bg: #fbe3dd;
+  --ins-bg: #dde9fb;
+  --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4;
+  --display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", "IBM Plex Sans Arabic", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --arabic: "IBM Plex Sans Arabic", "Noto Naskh Arabic", "Geeza Pro", "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121416; --surface: #1a1d20; --ink: #eef0f2; --ink-2: #c0c6cd; --muted: #8d959e; --line: #2c3136;
+    --accent: #6ea8ef; --vllm: #3987e5; --tf: #d95926; --card: #9a988f;
+    --serious: #f08a63; --serious-bg: #3a2119; --warn: #e2b04d; --warn-bg: #352a14; --ok: #5cc28a;
+    --del-bg: #4a2620; --ins-bg: #1f3350;
+    --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121416; --surface: #1a1d20; --ink: #eef0f2; --ink-2: #c0c6cd; --muted: #8d959e; --line: #2c3136;
+  --accent: #6ea8ef; --vllm: #3987e5; --tf: #d95926; --card: #9a988f;
+  --serious: #f08a63; --serious-bg: #3a2119; --warn: #e2b04d; --warn-bg: #352a14; --ok: #5cc28a;
+  --del-bg: #4a2620; --ins-bg: #1f3350;
+  --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--body); }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; max-width: 1180px; margin: 0 auto; padding: 0 20px 80px; }
+@media (min-width: 1100px) { .layout { grid-template-columns: 230px minmax(0, 1fr); } }
+nav.toc { display: none; }
+@media (min-width: 1100px) {
+  nav.toc { display: block; position: sticky; top: 24px; align-self: start; padding-top: 40px; font-size: 13.5px; }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; counter-reset: s; }
+  nav.toc li { counter-increment: s; }
+  nav.toc a { display: grid; grid-template-columns: 26px 1fr; color: var(--ink-2); text-decoration: none; padding: 4px 8px; border-radius: 6px; }
+  nav.toc a::before { content: counter(s, decimal-leading-zero); font-family: var(--mono); font-size: 11.5px; color: var(--muted); padding-top: 2px; }
+  nav.toc a:hover { background: var(--surface); color: var(--ink); }
+  nav.toc .toc-title { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px 8px; }
+}
+main { min-width: 0; }
+header.hero { padding: 44px 0 28px; border-bottom: 1px solid var(--line); }
+.kicker { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; text-wrap: balance; line-height: 1.2; }
+h1 { font-size: clamp(28px, 4.2vw, 42px); margin: 0 0 14px; max-width: 22ch; }
+h2 { font-size: 26px; margin: 0 0 6px; }
+h3 { font-size: 19px; margin: 28px 0 8px; }
+.lede { font-size: 18px; color: var(--ink-2); max-width: 68ch; margin: 0; }
+.meta-line { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 18px; font-size: 13.5px; color: var(--muted); }
+.meta-line code { font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); }
+section { padding: 40px 0 8px; border-bottom: 1px solid var(--line); scroll-margin-top: 16px; }
+section > p, section > ul, section > ol, .prose { max-width: 70ch; }
+.secnum { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: .06em; }
+p { margin: 0 0 14px; }
+ul, ol { padding-left: 22px; margin: 0 0 14px; }
+li { margin-bottom: 4px; }
+code, .mono { font-family: var(--mono); font-size: .88em; }
+code { background: var(--surface); border: 1px solid var(--line); padding: 1px 5px; border-radius: 4px; }
+.ar { font-family: var(--arabic); direction: rtl; unicode-bidi: isolate; }
+.note { font-size: 14px; color: var(--ink-2); background: var(--surface); border-left: 3px solid var(--line); padding: 10px 14px; border-radius: 0 6px 6px 0; max-width: 70ch; }
+.note.warn { border-left-color: var(--warn); background: var(--warn-bg); color: var(--ink); }
+.note.serious { border-left-color: var(--serious); background: var(--serious-bg); color: var(--ink); }
+
+/* Verdict */
+.verdict { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 26px; }
+.vcard { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: grid; gap: 8px; align-content: start; }
+.vcard .label { font-size: 13.5px; color: var(--ink-2); }
+.vcard .nums { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
+.vcard .big { font-family: var(--display); font-size: 34px; font-weight: 600; line-height: 1; }
+.vcard .vs { font-size: 14px; color: var(--muted); }
+.vcard .ci { font-size: 12.5px; color: var(--muted); font-family: var(--mono); }
+.pill { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; padding: 3px 10px 3px 8px; border-radius: 999px; width: fit-content; }
+.pill svg { width: 12px; height: 12px; flex: none; }
+.pill.serious { color: var(--serious); background: var(--serious-bg); }
+.pill.warn { color: var(--warn); background: var(--warn-bg); }
+.pill.ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }
+
+/* Tables */
+.tablewrap { overflow-x: auto; margin: 14px 0 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; color: var(--ink-2); font-size: 12.5px; background: color-mix(in srgb, var(--line) 35%, var(--surface)); }
+tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td .sub { display: block; font-size: 12px; color: var(--muted); }
+
+/* Charts */
+.chart { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 16px 12px; margin: 14px 0 18px; }
+.chart-title { font-weight: 600; font-size: 14.5px; margin: 0 0 2px; }
+.chart-sub { font-size: 12.5px; color: var(--muted); margin: 0 0 12px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink-2); margin: 0 0 12px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; flex: none; }
+.sw.line { height: 0; width: 14px; border-top: 2px dashed var(--card); border-radius: 0; }
+.hb { display: grid; grid-template-columns: minmax(110px, max-content) minmax(120px, 1fr) 62px; column-gap: 10px; row-gap: 2px; align-items: center; }
+.hb .lab { font-size: 13px; color: var(--ink-2); text-align: right; line-height: 1.25; padding: 3px 0; }
+.hb .lab .n { color: var(--muted); font-size: 11.5px; font-family: var(--mono); }
+.hb .val { font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+.hb .track { position: relative; height: 24px; }
+.hb .bar { position: absolute; left: 0; top: 5px; height: 14px; border-radius: 0 4px 4px 0; }
+.hb .ci { position: absolute; top: 11px; height: 2px; background: var(--ink); opacity: .75; }
+.hb .ci::before, .hb .ci::after { content: ""; position: absolute; top: -4px; width: 1.5px; height: 10px; background: var(--ink); }
+.hb .ci::before { left: 0; } .hb .ci::after { right: 0; }
+.hb .ref { position: absolute; top: -2px; bottom: -2px; border-left: 2px dashed var(--card); }
+.hb .row { display: contents; }
+.hb .row:hover .lab { color: var(--ink); }
+.hb .grp { grid-column: 1 / -1; font-size: 12.5px; font-weight: 600; color: var(--ink); padding: 10px 0 2px; border-top: 1px solid var(--line); margin-top: 6px; }
+.hb .grp:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+.axis { position: relative; height: 18px; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.axis span { position: absolute; transform: translateX(-50%); }
+.gridline { position: absolute; top: 0; bottom: 0; border-left: 1px solid var(--line); }
+.hb .hit { position: absolute; inset: 0; }
+.stack { display: grid; grid-template-columns: minmax(70px, max-content) minmax(0, 1fr); gap: 10px 12px; align-items: center; }
+.stack .lab { font-size: 13px; color: var(--ink-2); text-align: right; }
+.stack .bar { display: flex; height: 30px; gap: 2px; }
+.stack .seg { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; overflow: hidden; white-space: nowrap; }
+.stack .seg:first-child { border-radius: 4px 0 0 4px; } .stack .seg:last-child { border-radius: 0 4px 4px 0; }
+.dot { position: absolute; top: 5px; width: 13px; height: 13px; border-radius: 50%; background: var(--vllm); transform: translateX(-50%); box-shadow: 0 0 0 2px var(--surface); }
+.dot.main { width: 15px; height: 15px; top: 4px; }
+.conn { position: absolute; top: 11px; height: 2px; background: var(--line); }
+.subgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0 28px; }
+.subgrid .chart-title { margin-top: 6px; }
+svg.line text { fill: var(--muted); font-size: 11px; font-family: var(--body); }
+#tip { position: fixed; z-index: 10; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 12.5px; line-height: 1.45; padding: 7px 10px; border-radius: 6px; max-width: 280px; opacity: 0; transition: opacity .08s; }
+#tip b { font-weight: 600; }
+
+/* Pipeline */
+.flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 16px 0 20px; counter-reset: f; }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: 13.5px; counter-increment: f; position: relative; }
+.step::before { content: counter(f); font-family: var(--mono); font-size: 11.5px; color: var(--accent); display: block; margin-bottom: 4px; }
+.step b { display: block; font-size: 14px; margin-bottom: 4px; }
+.step .mono { font-size: 11.5px; color: var(--muted); display: block; margin-top: 6px; word-break: break-word; }
+
+/* Exemples & explorateur */
+.ex { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 10px 0; display: grid; gap: 6px; }
+.ex-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; font-size: 13px; }
+.ex-head .id { font-family: var(--mono); font-weight: 500; }
+.ex-head .tag { color: var(--muted); }
+.ex-head .cer { font-variant-numeric: tabular-nums; font-weight: 600; }
+.ex-type { font-size: 13px; color: var(--ink-2); }
+.tl { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 8px; align-items: start; }
+.tl .k { font-size: 11px; font-family: var(--mono); color: var(--muted); padding-top: 5px; }
+.tl .t { font-family: var(--arabic); direction: rtl; text-align: right; font-size: 15.5px; line-height: 1.85; unicode-bidi: plaintext; overflow-wrap: anywhere; }
+.tl .t .del { background: var(--del-bg); border-radius: 3px; text-decoration: line-through; text-decoration-color: var(--serious); text-decoration-thickness: 1px; }
+.tl .t .ins { background: var(--ins-bg); border-radius: 3px; }
+.tl .t .empty { font-family: var(--body); color: var(--muted); font-style: italic; direction: ltr; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: end; margin: 12px 0; }
+.controls label { display: grid; gap: 4px; font-size: 12.5px; color: var(--ink-2); }
+.controls select, .controls input[type="search"] { font: inherit; font-size: 14px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); min-width: 150px; }
+.controls input[type="search"] { min-width: 220px; }
+.controls .check { display: flex; align-items: center; gap: 6px; font-size: 13.5px; padding-bottom: 6px; }
+.count { font-size: 13px; color: var(--muted); }
+button.more { font: inherit; font-size: 14px; padding: 8px 16px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; margin-top: 6px; }
+button.more:hover { border-color: var(--accent); }
+.difflegend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink-2); }
+.difflegend .del, .difflegend .ins { padding: 0 6px; border-radius: 3px; }
+.difflegend .del { background: var(--del-bg); text-decoration: line-through; } .difflegend .ins { background: var(--ins-bg); }
+footer { padding: 32px 0 0; font-size: 13px; color: var(--muted); max-width: 70ch; }
+@media (max-width: 560px) {
+  .hb { grid-template-columns: minmax(90px, 38%) minmax(0, 1fr) 54px; }
+  .hb .lab { font-size: 12px; }
+  h2 { font-size: 23px; }
+}
+</style>
+</head>
+<body>
+<div id="tip" role="tooltip"></div>
+<div class="layout">
+<nav class="toc" aria-label="Sommaire">
+  <p class="toc-title">Sommaire</p>
+  <ol>
+    <li><a href="#verdict">Verdict</a></li>
+    <li><a href="#contexte">Contexte et question</a></li>
+    <li><a href="#modele">Modèle</a></li>
+    <li><a href="#dataset">Dataset</a></li>
+    <li><a href="#protocole">Protocole</a></li>
+    <li><a href="#resultats">Résultats</a></li>
+    <li><a href="#ventilations">Ventilations</a></li>
+    <li><a href="#comparaison">Comparaison model card</a></li>
+    <li><a href="#ecart">Expliquer l'écart</a></li>
+    <li><a href="#anomalies">Anomalies</a></li>
+    <li><a href="#erreurs">Analyse des erreurs</a></li>
+    <li><a href="#explorateur">Explorateur</a></li>
+    <li><a href="#limites">Limites</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#reproduire">Reproduire</a></li>
+  </ol>
+</nav>
+<main>
+<header class="hero">
+  <p class="kicker">Audit indépendant · reconnaissance de la parole · darija marocaine</p>
+  <h1>Voxtral Realtime Arabic reproduit-il ses scores sur DarijaCS ?</h1>
+  <p class="lede">Évaluation du modèle <code>Morocco-MITNRA-Labs/Voxtral-Mini-4B-Realtime-Arabic</code> sur les 466 enregistrements publics de DarijaCS, avec le protocole et la normalisation déclarés par les auteurs. Tous les chiffres mesurés de cette page viennent des exécutions décrites plus bas.</p>
+  <div class="meta-line">
+    <span>Modèle <code>@ceb7bc33</code></span>
+    <span>Dataset <code>@e2f4d96b</code></span>
+    <span>Exécution du 12 novembre 2026, NVIDIA L40S</span>
+    <span>Délai 480 ms · température 0</span>
+  </div>
+</header>
+
+<section id="verdict">
+  <span class="secnum">01</span>
+  <h2>Verdict</h2>
+  <p>Sur le périmètre vérifiable, <strong>les performances annoncées ne sont pas reproduites</strong>. Le CER mesuré dépasse nettement la valeur du model card sur les deux sous-ensembles de DarijaCS. L'écart tient avec deux méthodes d'inférence indépendantes, avec toutes les façons de calculer le CER que nous avons testées, et après retrait des échantillons anormaux.</p>
+  <div class="verdict" id="vcards"></div>
+  <div class="chart" id="c-hero">
+    <p class="chart-title">CER annoncé et CER mesuré</p>
+    <p class="chart-sub">Plus bas = meilleur. Barres d'erreur : intervalle de confiance à 95 % (bootstrap sur les échantillons). Survolez une barre pour le détail.</p>
+    <div class="legend"><span><i class="sw" style="background:var(--card)"></i>Model card (annoncé)</span><span><i class="sw" style="background:var(--vllm)"></i>Mesuré : vLLM Realtime, protocole principal</span><span><i class="sw" style="background:var(--tf)"></i>Mesuré : Transformers, contrôle croisé</span></div>
+    <div id="hero-chart"></div>
+  </div>
+</section>
+
+<section id="contexte">
+  <span class="secnum">02</span>
+  <h2>Contexte et question</h2>
+  <p>Le model card de <code>Voxtral-Mini-4B-Realtime-Arabic</code> annonce un CER moyen de <strong>8,82 %</strong> sur sept benchmarks arabes, avec un délai de transcription configuré à 480 ms. DarijaCS est le benchmark public de darija marocaine avec code-switching publié par le ministère marocain de la Transition numérique. Il comprend deux sous-ensembles : <strong>Prism</strong> (couverture large, 357 enregistrements) et <strong>Probe</strong> (cas ciblés pour révéler des faiblesses, 109 enregistrements).</p>
+  <p>La question posée est la suivante : évalué sur DarijaCS avec le protocole et la normalisation des auteurs, le modèle obtient-il les scores annoncés ? Pour y répondre, nous avons vérifié chaque élément avant de lancer l'évaluation : le dépôt du modèle, la structure du dataset, le format audio, le délai configuré et la fonction de normalisation.</p>
+  <p class="note">Le CER (Character Error Rate) compte les substitutions, suppressions et insertions de caractères nécessaires pour passer de la transcription du modèle à la référence, divisées par le nombre de caractères de la référence. Le WER fait la même chose au niveau des mots.</p>
+</section>
+
+<section id="modele">
+  <span class="secnum">03</span>
+  <h2>Le modèle évalué</h2>
+  <div class="tablewrap"><table>
+    <tbody>
+      <tr><th scope="row">Dépôt</th><td><code>Morocco-MITNRA-Labs/Voxtral-Mini-4B-Realtime-Arabic</code>, révision <code>ceb7bc33</code>, public</td></tr>
+      <tr><th scope="row">Identité</th><td>Fichier par fichier, identique (SHA256) à <code>mistralai/Voxtral-Mini-4B-Realtime-Arabic@7c60cf2a</code> : poids <code>consolidated.safetensors</code> et <code>model.safetensors</code>, <code>tekken.json</code>, configurations, <code>normalization.py</code>, images. <strong>Seul le README diffère.</strong></td></tr>
+      <tr><th scope="row">Architecture</th><td>Environ 4,4 milliards de paramètres en BF16. Encodeur audio causal de 32 couches, décodeur de 26 couches. Un token audio correspond à 80 ms. La normalisation Ada-RMS du décodeur est conditionnée par le délai.</td></tr>
+      <tr><th scope="row">Délai</th><td><code>tekken.json</code> : <code>transcription_delay_ms = 480</code>. <code>config.json</code> : <code>default_num_delay_tokens = 6</code>, soit 6 × 80 ms = 480 ms. Les deux voies d'inférence utilisent donc le même délai.</td></tr>
+      <tr><th scope="row">Normalisation</th><td><code>normalization.py</code>, fonction <code>normalize_arabic_asr</code>, SHA256 <code>501255ef…</code></td></tr>
+    </tbody>
+  </table></div>
+  <h3>Ce qui change entre les deux model cards</h3>
+  <p>Le README de Mistral présente les nouveaux benchmarks comme « ISMA et Darija in the Wild ». Celui de MITNRA parle de « DarijaCS, avec les sous-ensembles Prism et Probe ». Les images sont pourtant identiques dans les deux dépôts, et les graphiques affichent toujours les titres « ISMA » et « Darija in the Wild ». La section suivante établit la correspondance entre ces noms à partir de la composition des données.</p>
+</section>
+
+<section id="dataset">
+  <span class="secnum">04</span>
+  <h2>Le dataset DarijaCS</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th></th><th>DarijaCS-Prism</th><th>DarijaCS-Probe</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Échantillons</th><td>357, soit 1,495 h (5,8 à 26,1 s, médiane 14,0 s)</td><td>109, soit 0,255 h (2,2 à 28,6 s, médiane 7,3 s)</td></tr>
+      <tr><th scope="row">Audio publié</th><td>m4a AAC à <strong>48 kHz</strong>, 187 en stéréo et 170 en mono</td><td>WAV 16 kHz mono (94 en PCM 32 bits, 15 en PCM 16 bits)</td></tr>
+      <tr><th scope="row">Annotations</th><td><code>Domain</code> (9 valeurs), <code>Code switching</code> (0/1), <code>Pace</code> (33 manquants), <code>Noise</code></td><td><code>type</code> (plusieurs étiquettes possibles), <code>observations</code>, et la sortie d'un autre système, <code>darija-stt-solutions-2607_tr</code>, jamais utilisée comme référence</td></tr>
+      <tr><th scope="row">Licence</th><td colspan="2">CC BY 4.0, ministère de l'Intelligence artificielle, de la Transition numérique et de la Réforme de l'administration du Maroc</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Prism correspond à « ISMA », Probe à « Darija in the Wild »</h3>
+  <p>La figure de composition du model card reprend exactement la structure du dataset publié : 357 et 109 enregistrements, avec des effectifs identiques domaine par domaine pour Prism. La correspondance repose sur cette composition, pas sur une déclaration explicite des auteurs.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Domaine (model card, « ISMA »)</th><th class="num">Model card</th><th>Domaine (dataset, Prism)</th><th class="num">Dataset</th></tr></thead>
+    <tbody>
+      <tr><td>Business</td><td class="num">40</td><td>Business</td><td class="num">40</td></tr>
+      <tr><td>Engineering</td><td class="num">45</td><td>Engineering</td><td class="num">45</td></tr>
+      <tr><td>Entrepreneurship &amp; startups</td><td class="num">33</td><td>Entrepreneuriat et startups</td><td class="num">33</td></tr>
+      <tr><td>Finance</td><td class="num">40</td><td>Finance</td><td class="num">40</td></tr>
+      <tr><td>History</td><td class="num">40</td><td>History</td><td class="num">40</td></tr>
+      <tr><td>Mathematics</td><td class="num">39</td><td>maths</td><td class="num">39</td></tr>
+      <tr><td>Physics</td><td class="num">30</td><td>physics</td><td class="num">30</td></tr>
+      <tr><td>Life sciences</td><td class="num">40</td><td>SVT</td><td class="num">40</td></tr>
+      <tr><td>Tourism</td><td class="num">50</td><td>Tourism</td><td class="num">50</td></tr>
+    </tbody>
+  </table></div>
+  <p>Pour Probe, le total de 109 est identique. Le model card répartit les enregistrements en six catégories exclusives (Everyday CS 38, Baseline 23, Technical CS 16, Tricky names 15, Noise &amp; speed 11, Silence 6). Le dataset utilise des étiquettes multiples qui se recoupent : « Normal CS » seul 38, sans étiquette 23, « Tech CS » 16, « Tricky CS » 16.</p>
+</section>
+
+<section id="protocole">
+  <span class="secnum">05</span>
+  <h2>Protocole expérimental</h2>
+  <div class="flow">
+    <div class="step"><b>Inspection</b>Structure, colonnes, formats audio et durées vérifiés directement dans les fichiers parquet.<span class="mono">inspect_dataset.py · diag_audio.py</span></div>
+    <div class="step"><b>Préparation audio</b>Décodage ffmpeg 7.1, mono (moyenne des canaux), 16 kHz, WAV float32. Aucun échantillon exclu.<span class="mono">prepare_data.py</span></div>
+    <div class="step"><b>Inférence streaming</b>Serveur vLLM 0.33, WebSocket <code>/v1/realtime</code>, blocs PCM16 de 128 ms, délai 480 ms.<span class="mono">infer_vllm_realtime.py</span></div>
+    <div class="step"><b>Contrôle croisé</b>Transformers, <code>generate(do_sample=False)</code> sur l'audio entier, même délai.<span class="mono">infer_transformers.py</span></div>
+    <div class="step"><b>Métriques</b>Normalisation officielle des deux côtés, CER et WER sur le corpus, IC 95 % par bootstrap, Prism et Probe séparés.<span class="mono">compute_metrics.py</span></div>
+  </div>
+  <h3>Paramètres d'inférence</h3>
+  <div class="tablewrap"><table>
+    <tbody>
+      <tr><th scope="row">Délai</th><td>480 ms (<code>tekken.json</code>), vérifié et enregistré avec chaque exécution</td></tr>
+      <tr><th scope="row">Décodage</th><td>Glouton. vLLM : <code>--override-generation-config '{"temperature": 0.0}'</code>. Transformers : <code>do_sample=False</code>.</td></tr>
+      <tr><th scope="row">Échantillonneur vLLM</th><td><code>VLLM_USE_FLASHINFER_SAMPLER=0</code>, car la compilation à la volée de FlashInfer échoue sur les nœuds GPU. Aucun effet en décodage glouton, qui prend toujours le token le plus probable.</td></tr>
+      <tr><th scope="row">Protocole WebSocket</th><td><code>session.update</code> → <code>input_audio_buffer.commit</code> → blocs <code>input_audio_buffer.append</code> → <code>commit(final=True)</code> → <code>transcription.delta</code> → <code>transcription.done</code>. Un échantillon à la fois, envoyé sans attente entre les blocs.</td></tr>
+      <tr><th scope="row">Matériel</th><td>1 × NVIDIA L40S 46 Go, pilote 595.58.03, CUDA 13.2, nœud <code>gpu06</code></td></tr>
+      <tr><th scope="row">Temps d'inférence (vLLM)</th><td id="t-time"></td></tr>
+    </tbody>
+  </table></div>
+  <h3>Normalisation et calcul</h3>
+  <ul>
+    <li><code>normalize_arabic_asr</code> est appliquée à la référence et à la prédiction. Les références ne sont jamais modifiées pour le résultat principal.</li>
+    <li>CER = Σ(S + D + I) / Σ N caractères de référence sur tout le corpus, espaces compris (<code>jiwer.process_characters</code>). Le WER est calculé de la même façon sur les mots.</li>
+    <li>Prism et Probe sont toujours rapportés séparément, comme le recommande la fiche de DarijaCS. Les prédictions brutes sont conservées avant normalisation.</li>
+  </ul>
+  <p class="note warn"><strong>Annotations non prononcées dans Probe.</strong> Huit références contiennent des marqueurs de silence comme <span class="ar">[صمت 4 ثواني]</span> ou <code>[silence]</code>. La normalisation officielle retire les crochets mais garde les mots : <code>[silence]</code> devient <code>silence</code>. Le modèle est donc pénalisé pour ne pas avoir « transcrit » un silence. Le résultat principal garde ces références telles quelles. Leur effet est mesuré à part (environ 0,8 point).</p>
+</section>
+
+<section id="resultats">
+  <span class="secnum">06</span>
+  <h2>Résultats mesurés</h2>
+  <p>Les 466 enregistrements ont tous été transcrits, sans échec ni relance. Le CER et le WER, recalculés indépendamment à partir des prédictions, sont identiques aux valeurs du fichier de métriques.</p>
+  <div class="tablewrap"><table id="t-main"></table></div>
+  <p>Les deux méthodes d'inférence concordent sur Prism, à 0,05 point près. Sur Probe, Transformers obtient 1,25 point de moins, ce qui reste à examiner échantillon par échantillon.</p>
+  <h3>Répartition des erreurs de caractères</h3>
+  <div class="chart">
+    <p class="chart-sub">Part des substitutions, suppressions et insertions dans les erreurs de caractères (vLLM).</p>
+    <div class="legend"><span><i class="sw" style="background:var(--c1)"></i>Substitutions</span><span><i class="sw" style="background:var(--c4)"></i>Suppressions</span><span><i class="sw" style="background:var(--c5)"></i>Insertions</span></div>
+    <div id="sdi-chart"></div>
+  </div>
+</section>
+
+<section id="ventilations">
+  <span class="secnum">07</span>
+  <h2>Ventilations par condition</h2>
+  <p>Le bruit est le facteur le plus marqué : le CER de Prism passe de 7,27 % sur l'audio propre à 16,30 % sur l'audio bruité. La ligne pointillée grise rappelle la valeur annoncée pour l'ensemble du sous-ensemble.</p>
+  <div class="chart">
+    <p class="chart-title">DarijaCS-Prism, CER mesuré par condition (vLLM)</p>
+    <p class="chart-sub">IC 95 %. Ligne pointillée : 6,68 % annoncé pour l'ensemble de Prism.</p>
+    <div class="subgrid" id="prism-vent"></div>
+  </div>
+  <p class="note">Les 33 enregistrements « Entrepreneuriat et startups » sont exactement ceux étiquetés <code>Noise = medium</code> et ceux dont <code>Pace</code> est manquant. Ces trois catégories ont donc le même score, et l'effet du domaine ne peut pas être séparé de celui de ces conditions.</p>
+  <div class="chart">
+    <p class="chart-title">DarijaCS-Probe, CER mesuré par type de difficulté (vLLM)</p>
+    <p class="chart-sub">Un enregistrement peut porter plusieurs étiquettes. Les effectifs sont petits, d'où des intervalles larges. Ligne pointillée : 9,69 % annoncé pour l'ensemble de Probe.</p>
+    <div id="probe-vent"></div>
+  </div>
+  <p>Le code-switching technique et les cas de silence sont les plus difficiles. Les noms propres marocains (« Tricky CS ») sont bien reconnus.</p>
+</section>
+
+<section id="comparaison">
+  <span class="secnum">08</span>
+  <h2>Comparaison avec le model card</h2>
+  <h3>Valeurs relevées sur les graphiques du model card</h3>
+  <div class="tablewrap"><table id="t-card"></table></div>
+  <p>La moyenne des sept valeurs du modèle Realtime fait bien 8,82 %, ce qui est cohérent avec le chiffre annoncé.</p>
+  <div class="chart">
+    <p class="chart-title">Moyenne des 7 benchmarks selon le délai configuré (model card)</p>
+    <p class="chart-sub">Valeurs lues sur <code>avg_evals_by_delay.png</code>. Échelle logarithmique sur l'axe du délai.</p>
+    <div id="delay-chart"></div>
+  </div>
+  <p class="note serious"><strong>Correction de la mission.</strong> Les valeurs de 8,97 % (Darija in the Wild) et 18,60 % (Casablanca) correspondent à <strong>Voxtral Transcribe Arabic</strong>, le modèle offline de référence. Pour le modèle Realtime évalué ici, le model card donne <strong>9,69 %</strong> et <strong>20,34 %</strong>.</p>
+  <p>Le model card contient aussi deux petites incohérences. Sur le graphique par délai, la légende indique 8,80 % (valeur à 720 ms) alors que le point à 480 ms vaut 8,82 %. Muse et Cohere y valent 10,76 % et 14,35 %, contre 10,77 % et 14,34 % sur le graphique par benchmark.</p>
+  <h3>Tableau comparatif</h3>
+  <div class="tablewrap"><table id="t-compare"></table></div>
+  <p class="note"><strong>Calcul hypothétique, pas une mesure.</strong> Si l'on remplace dans la moyenne du model card les valeurs ISMA et Darija in the Wild par nos mesures, en gardant les cinq autres valeurs annoncées, la moyenne sur sept benchmarks passe de 8,82 % à 9,69 % avec vLLM, ou 9,51 % avec Transformers.</p>
+</section>
+
+<section id="ecart">
+  <span class="secnum">09</span>
+  <h2>D'où peut venir l'écart ?</h2>
+  <p>Nous avons recalculé le CER de plusieurs façons et retiré les cas anormaux. Aucune variante ne rejoint la valeur annoncée. Comme les auteurs ont évalué exactement les mêmes enregistrements, l'écart ne peut pas venir des aléas d'échantillonnage. Il reflète une différence de données, de protocole ou de modèle entre leur évaluation et les ressources publiques.</p>
+  <div class="chart">
+    <p class="chart-title">CER selon la méthode de calcul</p>
+    <p class="chart-sub">Chaque point est une variante. La ligne pointillée marque la valeur annoncée ; le gros point, le résultat principal.</p>
+    <div class="subgrid" id="robust"></div>
+  </div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Hypothèse</th><th>Ce que nous avons testé</th><th>Conclusion</th></tr></thead>
+    <tbody>
+      <tr><td>Normalisation</td><td>Fichier officiel, identique dans les deux dépôts, appliqué aux deux côtés</td><td><span class="pill ok">Exclue</span></td></tr>
+      <tr><td>Calcul du CER</td><td>Corpus ou moyenne par enregistrement, avec ou sans espaces : Prism de 8,81 à 9,69 %, Probe de 13,42 à 15,05 %</td><td><span class="pill ok">Exclue</span></td></tr>
+      <tr><td>Paramètres d'inférence</td><td>Délai de 480 ms vérifié dans les deux voies ; décodage glouton</td><td><span class="pill ok">Conformes</span></td></tr>
+      <tr><td>Méthode d'inférence</td><td>vLLM en streaming et Transformers : 9,03 / 8,98 % sur Prism, 13,42 / 12,17 % sur Probe</td><td><span class="pill ok">N'explique pas l'écart</span></td></tr>
+      <tr><td>Anomalies du dataset</td><td>Référence erronée, doublon, annotations de silence</td><td>Au plus 0,5 point (Prism) et 0,8 point (Probe)</td></tr>
+      <tr><td>Version du modèle</td><td>Poids identiques dans les deux dépôts publics ; checkpoint réellement évalué par les auteurs inconnu</td><td><span class="pill warn">Non vérifiable</span></td></tr>
+      <tr><td>Version de l'audio ou des références</td><td>Prism est publié en AAC compressé. Les auteurs ont pu évaluer les enregistrements originaux ou une autre version des références.</td><td><span class="pill warn">Non vérifiable</span></td></tr>
+      <tr><td>Exposition au benchmark</td><td>Non documentée. Un entraînement sur ces données ferait baisser le CER, pas l'augmenter.</td><td>N'explique pas un CER plus élevé</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Analyses de sensibilité</h3>
+  <div class="tablewrap"><table id="t-sens"></table></div>
+  <p>La colonne <code>darija-stt-solutions-2607_tr</code> fournie dans Probe obtient un CER de 9,27 %. On ignore comment ces transcriptions ont été produites, et Probe a pu être construit en partie à partir des échecs de ce système. Cette valeur n'est donc qu'un repère.</p>
+</section>
+
+<section id="anomalies">
+  <span class="secnum">10</span>
+  <h2>Anomalies détectées</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Enregistrement</th><th>Problème</th><th>Effet mesuré</th></tr></thead>
+    <tbody>
+      <tr><td><code>prism_246</code></td><td><strong>Référence erronée.</strong> Elle est identique mot pour mot à celle de <code>prism_247</code>, qui parle de cryptomonnaies. Le modèle transcrit pourtant un passage cohérent sur les taux d'intérêt. Aucune autre référence du dataset ne correspond à cet audio (meilleur CER croisé : 64,9 %).</td><td class="num">CER 77,5 %<span class="sub">Prism sans lui : 8,80 %</span></td></tr>
+      <tr><td><code>prism_133</code></td><td><strong>Sortie vide de vLLM</strong> sur 10,7 s de parole bruitée.</td><td class="num">CER 100 %<span class="sub">Prism sans lui : 8,77 %</span></td></tr>
+      <tr><td><code>prism_187</code> / <code>188</code></td><td>Doublon exact : même audio, même référence.</td><td class="num">Sans 188 : 9,04 %</td></tr>
+      <tr><td>8 références de Probe</td><td>Annotations de silence non prononcées, gardées par la normalisation sous forme de mots.</td><td class="num">Retirées : 12,62 %</td></tr>
+      <tr><td><code>probe_30</code></td><td>Référence <code>[silence]</code> seule. Le modèle ne produit rien, ce qui est le comportement attendu, mais il est compté à 100 % d'erreur.</td><td class="num">Sans lui : 13,36 %</td></tr>
+      <tr><td>Fin des flux</td><td>Pas de troncature systématique. Seules 7,9 % (Prism) et 7,0 % (Probe) des suppressions de mots tombent dans les 10 % finaux des références.</td><td class="num">Aucun</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="erreurs">
+  <span class="secnum">11</span>
+  <h2>Analyse des erreurs</h2>
+  <h3>Nature des erreurs de mots</h3>
+  <div class="chart">
+    <p class="chart-sub">Classement automatique après normalisation officielle. Une substitution est une « variante » quand les deux mots sont très proches (distance de Levenshtein normalisée ≤ 0,34).</p>
+    <div class="legend" id="cat-legend"></div>
+    <div id="cat-chart"></div>
+  </div>
+  <h3>Le code-switching, principale faiblesse</h3>
+  <p>Les mots en écriture latine de la référence (français et anglais) sont trois fois plus souvent faux que les mots en écriture arabe. Plus de la moitié de ces erreurs viennent de mots transcrits <strong>en écriture arabe</strong> au lieu du latin : <code>les</code> → <span class="ar">لي</span> (12 fois), <code>systeme</code> → <span class="ar">السيستيم</span>, <code>maths</code> → <span class="ar">الماط</span>, <code>mobile</code> → <span class="ar">الموبايل</span>. La normalisation ne peut pas réconcilier ces deux formes.</p>
+  <div class="chart">
+    <p class="chart-title">Taux d'erreur par écriture du mot de référence (vLLM)</p>
+    <div class="legend"><span><i class="sw" style="background:var(--c1)"></i>Mots en écriture arabe</span><span><i class="sw" style="background:var(--c2)"></i>Mots en écriture latine</span></div>
+    <div id="script-chart"></div>
+  </div>
+  <h3>Variantes orthographiques de la darija</h3>
+  <p>Une part importante des « erreurs » sont des graphies concurrentes d'un même mot, que la normalisation officielle ne fusionne pas : <span class="ar">دبا → دابا</span> (9 fois), <span class="ar">خصني ↔ خاصني</span>, <span class="ar">وخا → واخا</span>, <span class="ar">هما → هم</span>, <span class="ar">ديال ↔ د</span>. Il y a aussi les clitiques en écriture mixte : la référence <span class="ar">الmaths</span> est découpée en <span class="ar">ال maths</span>, alors que le modèle écrit <span class="ar">الماط</span>. Ces cas pénalisent tous les systèmes de la même façon. Ils n'expliquent pas l'écart avec le model card, mais ils gonflent le niveau absolu du CER.</p>
+  <h3>Nombres</h3>
+  <p>Sur Prism, 70 tokens numériques ont 15,7 % d'erreur. Les cas typiques sont des nombres écrits en toutes lettres que la normalisation ne convertit pas (<code>100</code> → <span class="ar">بميه</span>, <code>20</code> → <span class="ar">العشرين</span>), des nombres dits en français (<span class="ar">racine de 2 → غاسين دو</span>) ou des inversions (<code>50 30 20</code> → <code>20 30 50</code>). Sur Probe, 7 des 8 nombres en erreur viennent des annotations de silence. Ce ne sont donc pas de vraies erreurs de nombres.</p>
+  <h3>Noms propres et expressions marocaines</h3>
+  <p>Les toponymes et noms marocains de Probe sont bien reconnus (CER de 6,58 % sur « Tricky CS ») : <span class="ar">ايت بن حدو</span>, <span class="ar">ورزازات</span>, <span class="ar">سيدي يحيا الغرب</span>, <span class="ar">لاله فاطمه</span> sont transcrits sans erreur. Il reste des erreurs ponctuelles : <span class="ar">سيدي حرازم → سيدي حراز</span>, <span class="ar">سلا → شلا</span>, <span class="ar">موكادور → مقادور</span>.</p>
+  <h3>Exemples commentés</h3>
+  <div class="difflegend"><span>Textes normalisés.</span><span><span class="del">mot</span> absent ou différent dans la prédiction</span><span><span class="ins">mot</span> ajouté ou différent dans la prédiction</span></div>
+  <div id="examples"></div>
+</section>
+
+<section id="explorateur">
+  <span class="secnum">12</span>
+  <h2>Explorateur des 466 transcriptions</h2>
+  <p>Toutes les prédictions vLLM, avec leur référence, après normalisation officielle. Filtrez par sous-ensemble ou cherchez un identifiant, un mot ou une étiquette.</p>
+  <div class="controls">
+    <label for="f-subset">Sous-ensemble
+      <select id="f-subset"><option value="">Tous</option><option>Prism</option><option>Probe</option></select>
+    </label>
+    <label for="f-sort">Trier par
+      <select id="f-sort"><option value="cer-desc">CER décroissant</option><option value="cer-asc">CER croissant</option><option value="id">Identifiant</option></select>
+    </label>
+    <label for="f-q">Rechercher
+      <input type="search" id="f-q" placeholder="prism_246, maths, Tech CS…">
+    </label>
+    <label class="check" for="f-err"><input type="checkbox" id="f-err"> Seulement avec erreurs</label>
+  </div>
+  <p class="count" id="f-count"></p>
+  <div class="difflegend"><span><span class="del">mot</span> absent ou différent dans la prédiction</span><span><span class="ins">mot</span> ajouté ou différent dans la prédiction</span></div>
+  <div id="explorer"></div>
+  <button class="more" id="more" type="button">Afficher 20 de plus</button>
+</section>
+
+<section id="limites">
+  <span class="secnum">13</span>
+  <h2>Limites</h2>
+  <ol>
+    <li><strong>Périmètre.</strong> Seuls 2 des 7 benchmarks de la moyenne annoncée sont dans DarijaCS. La moyenne de 8,82 % ne peut être ni confirmée ni infirmée directement.</li>
+    <li><strong>Protocole des auteurs inconnu.</strong> Ni script d'évaluation, ni prédictions, ni version exacte des références et de l'audio ne sont publiés.</li>
+    <li><strong>Audio de Prism.</strong> Une seule chaîne de prétraitement a été testée (ffmpeg, moyenne des canaux). Le chargement via <code>mistral_common.Audio</code> de l'exemple du README n'a pas été testé séparément.</li>
+    <li><strong>Cadence du streaming.</strong> L'audio a été envoyé plus vite que le temps réel. Pour un modèle causal, la sortie ne devrait pas changer, et la voie Transformers le confirme à peu près. Un passage à cadence réelle reste à faire.</li>
+    <li><strong>Une seule exécution</strong> par méthode d'inférence. Le décodage est glouton, mais la reproductibilité au bit près n'a pas été vérifiée.</li>
+    <li><strong>Classement des erreurs heuristique</strong> (seuil de distance, détection de l'écriture). Les proportions sont des ordres de grandeur.</li>
+    <li><strong>Petits effectifs</strong> pour les étiquettes de Probe (7 à 49 enregistrements).</li>
+  </ol>
+</section>
+
+<section id="conclusion">
+  <span class="secnum">14</span>
+  <h2>Conclusion</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Indicateur</th><th class="num">Annoncé</th><th class="num">Mesuré</th><th class="num">Meilleur cas testé</th><th>Statut</th></tr></thead>
+    <tbody>
+      <tr><td>DarijaCS-Prism (« ISMA »)</td><td class="num">6,68 %</td><td class="num">9,03 %</td><td class="num">8,54 %<span class="sub">sans les 2 anomalies</span></td><td><span class="pill serious">Non reproduit</span></td></tr>
+      <tr><td>DarijaCS-Probe (« Darija in the Wild »)</td><td class="num">9,69 %</td><td class="num">13,42 %</td><td class="num">11,36 %<span class="sub">Transformers, sans annotations</span></td><td><span class="pill serious">Non reproduit</span></td></tr>
+      <tr><td>Moyenne sur 7 benchmarks</td><td class="num">8,82 %</td><td class="num">–</td><td class="num">–</td><td><span class="pill warn">Impossible à vérifier</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>L'écart tient avec toutes les variantes de normalisation et de calcul testées, et il est confirmé par deux méthodes d'inférence indépendantes. Les anomalies du dataset et le traitement des annotations ne l'expliquent pas. Trois causes restent possibles, que seuls les auteurs peuvent départager : un checkpoint différent de celui publié, une autre version de l'audio (non compressé) ou des références, ou une chaîne d'évaluation non documentée.</p>
+  <h3>Recommandations</h3>
+  <ol>
+    <li><strong>Demander aux auteurs</strong> leur script d'évaluation, leurs prédictions par enregistrement et la version exacte de l'audio et des références.</li>
+    <li><strong>Relances peu coûteuses</strong> : chargement de l'audio comme dans l'exemple du README, canal gauche seul, cadence temps réel, comparaison vLLM / Transformers enregistrement par enregistrement, examen de <code>prism_133</code>.</li>
+    <li><strong>Corriger DarijaCS</strong> : référence de <code>prism_246</code>, doublon <code>187</code>/<code>188</code>, annotations de silence de Probe, valeurs <code>Pace</code> manquantes, confusion entre le domaine Entrepreneuriat et les conditions de bruit et de vitesse.</li>
+    <li><strong>Vérifier la moyenne de 8,82 %</strong> en évaluant avec le même pipeline les cinq autres benchmarks publics (MGB-2, SADA, Casablanca, FLEURS arabe, MASC clean).</li>
+    <li><strong>Étendre la normalisation</strong> aux variantes orthographiques fréquentes de la darija et documenter le traitement des emprunts écrits en arabe. Ce sont les deux principales sources d'erreur mesurées.</li>
+  </ol>
+</section>
+
+<section id="reproduire">
+  <span class="secnum">15</span>
+  <h2>Reproduire l'évaluation</h2>
+  <div class="tablewrap"><table>
+    <tbody>
+      <tr><th scope="row">Logiciels</th><td>Python 3.11 · vllm 0.33.0 · torch 2.14.0 · transformers 5.20.2 · accelerate · mistral_common 1.13.1 · flashinfer-python 0.7.2.post1 · jiwer 4.0.0 · pandas 3.1.1 · soundfile 0.14.0 · websockets 17.4 · ffmpeg 7.1</td></tr>
+      <tr><th scope="row">Empreintes</th><td><code>tekken.json</code> 2a88a9b8… · <code>params.json</code> 2ace010e… · <code>config.json</code> 560dcfc0… · <code>normalization.py</code> 501255ef…</td></tr>
+      <tr><th scope="row">Scripts</th><td><code>inspect_dataset.py</code>, <code>diag_audio.py</code>, <code>check_normalization.py</code>, <code>prepare_data.py</code>, <code>check_delay.py</code>, <code>infer_vllm_realtime.py</code>, <code>infer_transformers.py</code>, <code>compute_metrics.py</code>, <code>run_eval.pbs</code>, <code>run_transformers.pbs</code>, <code>make_figures.py</code></td></tr>
+      <tr><th scope="row">Résultats</th><td><code>eval/runs/run_20261112_0440/</code> : <code>predictions.csv</code>, <code>predictions_scored.csv</code>, <code>metrics.json</code>, <code>environment.txt</code>, <code>vllm_server.log</code>, et <code>transformers/</code></td></tr>
+    </tbody>
+  </table></div>
+  <h3>Commandes principales</h3>
+  <div class="tablewrap"><table><tbody>
+    <tr><td><code>python eval/prepare_data.py data-test/DarijaCS-asr-eval data-test/prepared</code></td></tr>
+    <tr><td><code>qsub eval/run_eval.pbs</code><span class="sub">serveur vLLM, client streaming, métriques, puis contrôle Transformers</span></td></tr>
+    <tr><td><code>python eval/compute_metrics.py --manifests … --predictions … --normalization-dir Voxtral-Mini-4B-Realtime-Arabic --out …</code></td></tr>
+  </tbody></table></div>
+</section>
+
+<footer>
+  <p>DarijaCS-Prism et DarijaCS-Probe : Ministry of Artificial Intelligence, Digital Transformation and Administration Reform, Kingdom of Morocco (2026), licence <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Données utilisées sans modification ; les extraits affichés sont normalisés avec <code>normalize_arabic_asr</code>. Valeurs du model card lues sur les figures du dépôt <code>Morocco-MITNRA-Labs/Voxtral-Mini-4B-Realtime-Arabic</code>.</p>
+</footer>
+</main>
+</div>
+
+<script>
+const D = /*DATA*/;
+const fr = (v, d = 2) => v == null ? "–" : v.toFixed(d).replace(".", ",");
+const pct = (v, d = 2) => v == null ? "–" : fr(v, d) + " %";
+const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+
+/* Info-bulle partagée */
+const tip = document.getElementById("tip");
+function bindTip(node, lines) {
+  const show = (ev) => {
+    tip.replaceChildren();
+    lines.forEach((l, i) => { const p = el(i === 0 ? "b" : "div", null, l); tip.append(p); if (i === 0) tip.append(document.createElement("br")); });
+    tip.style.opacity = 1; move(ev);
+  };
+  const move = (ev) => {
+    const r = tip.getBoundingClientRect();
+    let x = ev.clientX + 14, y = ev.clientY + 14;
+    if (x + r.width > innerWidth - 8) x = ev.clientX - r.width - 14;
+    if (y + r.height > innerHeight - 8) y = ev.clientY - r.height - 14;
+    tip.style.left = Math.max(8, x) + "px"; tip.style.top = Math.max(8, y) + "px";
+  };
+  node.addEventListener("pointerenter", show);
+  node.addEventListener("pointermove", move);
+  node.addEventListener("pointerleave", () => { tip.style.opacity = 0; });
+}
+
+/* Barres horizontales : rows = [{group?} | {label, n, v, lo, hi, color, tip}] */
+function hbars(host, rows, { max, ref, step = 5 }) {
+  const g = el("div", "hb");
+  const ticks = []; for (let t = 0; t <= max + 1e-9; t += step) ticks.push(t);
+  rows.forEach(r => {
+    if (r.group) { g.append(el("div", "grp", r.group)); return; }
+    const lab = el("div", "lab", r.label);
+    if (r.n != null) { lab.append(document.createElement("br")); lab.append(el("span", "n", "n = " + r.n)); }
+    const tr = el("div", "track");
+    ticks.forEach(t => { const gl = el("div", "gridline"); gl.style.left = (100 * t / max) + "%"; tr.append(gl); });
+    const b = el("div", "bar"); b.style.width = (100 * r.v / max) + "%"; b.style.background = r.color || "var(--vllm)"; tr.append(b);
+    if (r.lo != null) { const c = el("div", "ci"); c.style.left = (100 * r.lo / max) + "%"; c.style.width = (100 * (r.hi - r.lo) / max) + "%"; tr.append(c); }
+    if (ref != null) { const rl = el("div", "ref"); rl.style.left = (100 * ref / max) + "%"; tr.append(rl); }
+    const hit = el("div", "hit"); tr.append(hit);
+    const val = el("div", "val", pct(r.v));
+    g.append(lab, tr, val);
+    bindTip(hit, r.tip || [r.label, "CER " + pct(r.v) + (r.lo != null ? "  [IC 95 % " + fr(r.lo) + " – " + fr(r.hi) + "]" : "")]);
+  });
+  g.append(el("div"));
+  const ax = el("div", "axis"); ticks.forEach(t => { const s = el("span", null, String(t)); s.style.left = (100 * t / max) + "%"; ax.append(s); });
+  g.append(ax, el("div"));
+  host.append(g);
+}
+
+/* Cartes verdict */
+(function () {
+  const ic = { serious: '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+               warn: '<svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6 3.6v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="6" cy="8.6" r=".9" fill="currentColor"/></svg>' };
+  const cards = [
+    { label: "DarijaCS-Prism (« ISMA » dans le model card)", big: pct(D.main.Prism.cer), vs: "annoncé 6,68 %", ci: "IC 95 % " + fr(D.main.Prism.lo) + " – " + fr(D.main.Prism.hi) + " · +" + fr(D.main.Prism.cer - 6.68) + " pt", st: "serious", stl: "Non reproduit" },
+    { label: "DarijaCS-Probe (« Darija in the Wild »)", big: pct(D.main.Probe.cer), vs: "annoncé 9,69 %", ci: "IC 95 % " + fr(D.main.Probe.lo) + " – " + fr(D.main.Probe.hi) + " · +" + fr(D.main.Probe.cer - 9.69) + " pt", st: "serious", stl: "Non reproduit" },
+    { label: "Moyenne sur 7 benchmarks", big: "8,82 %", vs: "annoncé", ci: "5 benchmarks sur 7 hors de DarijaCS", st: "warn", stl: "Impossible à vérifier" },
+  ];
+  const host = document.getElementById("vcards");
+  cards.forEach(c => {
+    const v = el("div", "vcard");
+    const p = el("span", "pill " + c.st); p.innerHTML = ic[c.st]; p.append(document.createTextNode(c.stl));
+    const nums = el("div", "nums"); nums.append(el("span", "big", c.big), el("span", "vs", c.vs));
+    v.append(p, el("div", "label", c.label), nums, el("div", "ci", c.ci));
+    host.append(v);
+  });
+})();
+
+/* Graphique principal */
+(function () {
+  const rows = [];
+  [["Prism", 6.68, "DarijaCS-Prism"], ["Probe", 9.69, "DarijaCS-Probe"]].forEach(([s, card, name]) => {
+    const m = D.main[s], t = D.tf[s];
+    rows.push({ group: name + (s === "Prism" ? " (« ISMA »)" : " (« Darija in the Wild »)") });
+    rows.push({ label: "Model card", v: card, color: "var(--card)", tip: [name + " · model card", "CER annoncé " + pct(card)] });
+    rows.push({ label: "vLLM Realtime", v: m.cer, lo: m.lo, hi: m.hi, color: "var(--vllm)", tip: [name + " · vLLM Realtime 480 ms", "CER " + pct(m.cer) + "  [IC 95 % " + fr(m.lo) + " – " + fr(m.hi) + "]", "WER " + pct(m.wer), "Écart " + "+" + fr(m.cer - card) + " pt"] });
+    rows.push({ label: "Transformers", v: t.cer, lo: t.lo, hi: t.hi, color: "var(--tf)", tip: [name + " · Transformers", "CER " + pct(t.cer) + "  [IC 95 % " + fr(t.lo) + " – " + fr(t.hi) + "]", "WER " + pct(t.wer), "Écart +" + fr(t.cer - card) + " pt"] });
+  });
+  hbars(document.getElementById("hero-chart"), rows, { max: 18, step: 3 });
+})();
+
+/* Temps d'inférence */
+document.getElementById("t-time").textContent = fr(D.time.moyenne_s_par_echantillon) + " s en moyenne par enregistrement, " + fr(D.time.total_s, 1) + " s au total pour 1,75 h d'audio, soit un facteur temps réel de " + fr(D.time.rtf_global, 3) + ". Mesuré côté client, connexion WebSocket comprise.";
+
+/* Tableau principal */
+(function () {
+  const t = document.getElementById("t-main");
+  const head = ["Sous-ensemble", "n", "Durée", "CER corpus [IC 95 %]", "CER moyen par enreg.", "WER corpus [IC 95 %]"];
+  const thead = el("thead"); const hr = el("tr"); head.forEach((h, i) => hr.append(el("th", i ? "num" : null, h))); thead.append(hr); t.append(thead);
+  const tb = el("tbody");
+  [["Prism", "vLLM"], ["Probe", "vLLM"]].forEach(([s]) => {
+    const m = D.main[s]; const tr = el("tr");
+    const c0 = el("td"); c0.append(el("strong", null, "DarijaCS-" + s)); c0.append(el("span", "sub", "vLLM Realtime, protocole principal"));
+    tr.append(c0, el("td", "num", String(m.n)), el("td", "num", fr(m.h, 3) + " h"),
+      el("td", "num", pct(m.cer) + "  [" + fr(m.lo) + " – " + fr(m.hi) + "]"), el("td", "num", pct(m.cerMacro)),
+      el("td", "num", pct(m.wer) + "  [" + fr(m.werLo) + " – " + fr(m.werHi) + "]"));
+    tb.append(tr);
+  });
+  ["Prism", "Probe"].forEach(s => {
+    const m = D.tf[s]; const tr = el("tr");
+    const c0 = el("td"); c0.append(el("strong", null, "DarijaCS-" + s)); c0.append(el("span", "sub", "Transformers, contrôle croisé"));
+    tr.append(c0, el("td", "num", String(D.main[s].n)), el("td", "num", ""), el("td", "num", pct(m.cer) + "  [" + fr(m.lo) + " – " + fr(m.hi) + "]"), el("td", "num", "–"), el("td", "num", pct(m.wer)));
+    tb.append(tr);
+  });
+  t.append(tb);
+})();
+
+/* Barres empilées */
+function stacked(host, rows, cats) {
+  const g = el("div", "stack");
+  rows.forEach(r => {
+    g.append(el("div", "lab", r.label));
+    const bar = el("div", "bar");
+    const tot = cats.reduce((a, c) => a + r.vals[c.key], 0);
+    cats.forEach(c => {
+      const p = 100 * r.vals[c.key] / tot;
+      const s = el("div", "seg"); s.style.width = p + "%"; s.style.background = c.color; s.style.color = c.ink;
+      if (p >= 8) s.textContent = Math.round(p) + " %";
+      bar.append(s);
+      bindTip(s, [r.label + " · " + c.name, Math.round(p * 10) / 10 + " % (" + r.vals[c.key] + " " + (r.unit || "") + ")"]);
+    });
+    g.append(bar);
+  });
+  host.append(g);
+}
+stacked(document.getElementById("sdi-chart"),
+  ["Prism", "Probe"].map(s => ({ label: s, unit: "caractères", vals: { S: D.main[s].S, D: D.main[s].D, I: D.main[s].I } })),
+  [{ key: "S", name: "Substitutions", color: "var(--c1)", ink: "#fff" }, { key: "D", name: "Suppressions", color: "var(--c4)", ink: "#15191d" }, { key: "I", name: "Insertions", color: "var(--c5)", ink: "#15191d" }]);
+
+/* Ventilations Prism */
+(function () {
+  const host = document.getElementById("prism-vent");
+  const V = D.vent.Prism;
+  const panels = [["Bruit", "Noise", ["clean", "little", "medium", "noise"]], ["Vitesse d'élocution", "Pace", ["slow", "medium", "fast", "non_annote"]], ["Code-switching", "Code_switching", ["0", "1"]], ["Domaine", "Domain", null]];
+  const names = { non_annote: "non annoté", "0": "sans code-switching", "1": "avec code-switching" };
+  panels.forEach(([title, key, order]) => {
+    const box = el("div"); box.append(el("p", "chart-title", title));
+    const d = V[key]; order = order || Object.keys(d).sort((a, b) => d[b].cer - d[a].cer);
+    hbars(box, order.map(k => ({ label: names[k] || k, n: d[k].n, v: d[k].cer, lo: d[k].lo, hi: d[k].hi,
+      tip: [title + " : " + (names[k] || k), "n = " + d[k].n + " · " + fr(d[k].h, 3) + " h", "CER " + pct(d[k].cer) + "  [IC 95 % " + fr(d[k].lo) + " – " + fr(d[k].hi) + "]", "WER " + pct(d[k].wer)] })), { max: 25, ref: 6.68 });
+    host.append(box);
+  });
+})();
+
+/* Ventilations Probe */
+(function () {
+  const d = D.vent.Probe; const names = { non_annote: "sans étiquette (parole de base)", None: "« None » (+ autre étiquette)" };
+  const order = Object.keys(d).sort((a, b) => d[b].cer - d[a].cer);
+  hbars(document.getElementById("probe-vent"), order.map(k => ({ label: names[k] || k, n: d[k].n, v: d[k].cer, lo: d[k].lo, hi: d[k].hi,
+    tip: [names[k] || k, "n = " + d[k].n, "CER " + pct(d[k].cer) + "  [IC 95 % " + fr(d[k].lo) + " – " + fr(d[k].hi) + "]", "WER " + pct(d[k].wer)] })), { max: 35, ref: 9.69 });
+})();
+
+/* Tableau model card */
+(function () {
+  const t = document.getElementById("t-card");
+  const hr = el("tr"); ["Benchmark", "Voxtral Mini 4B Realtime Arabic (480 ms)", "Voxtral Transcribe Arabic (offline)"].forEach((h, i) => hr.append(el("th", i ? "num" : null, h)));
+  const th = el("thead"); th.append(hr); t.append(th);
+  const tb = el("tbody");
+  Object.keys(D.card.Realtime).forEach(k => {
+    const tr = el("tr"); const a = el("td", null, k); if (/Prism|Probe|Moyenne/.test(k)) a.style.fontWeight = 600;
+    tr.append(a, el("td", "num", pct(D.card.Realtime[k])), el("td", "num", pct(D.card.Transcribe[k]))); tb.append(tr);
+  });
+  t.append(tb);
+})();
+
+/* Courbe délai */
+function delayChart() {
+  const host = document.getElementById("delay-chart"); host.replaceChildren();
+  const W = Math.max(280, host.clientWidth), H = 210, m = { l: 48, r: 24, t: 26, b: 30 };
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg"); svg.setAttribute("class", "line"); svg.setAttribute("width", W); svg.setAttribute("height", H); svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", "CER moyen annoncé selon le délai : 80 ms 10,64 %, 160 ms 9,76 %, 320 ms 9,17 %, 480 ms 8,82 %, 720 ms 8,80 %");
+  const lx = d => m.l + (Math.log(d) - Math.log(80)) / (Math.log(720) - Math.log(80)) * (W - m.l - m.r);
+  const y = v => m.t + (11.2 - v) / (11.2 - 8) * (H - m.t - m.b);
+  const mk = (tag, at) => { const n = document.createElementNS(ns, tag); Object.entries(at).forEach(([k, v]) => n.setAttribute(k, v)); svg.append(n); return n; };
+  [8, 9, 10, 11].forEach(v => { mk("line", { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), stroke: "var(--line)" }); const t = mk("text", { x: m.l - 8, y: y(v) + 4, "text-anchor": "end" }); t.textContent = v + " %"; });
+  D.card.delay.forEach(([d]) => { const t = mk("text", { x: lx(d), y: H - 8, "text-anchor": "middle" }); t.textContent = d + " ms"; });
+  const path = D.card.delay.map(([d, v], i) => (i ? "L" : "M") + lx(d) + "," + y(v)).join(" ");
+  mk("path", { d: path + ` L${lx(720)},${y(8)} L${lx(80)},${y(8)} Z`, fill: "var(--vllm)", opacity: .08 });
+  mk("path", { d: path, fill: "none", stroke: "var(--vllm)", "stroke-width": 2 });
+  D.card.delay.forEach(([d, v]) => {
+    const c = mk("circle", { cx: lx(d), cy: y(v), r: d === 480 ? 6 : 4.5, fill: d === 480 ? "var(--vllm)" : "var(--surface)", stroke: "var(--vllm)", "stroke-width": 2 });
+    const t = mk("text", { x: lx(d) + (d === 80 ? 6 : 0), y: y(v) - 11, "text-anchor": d === 80 ? "start" : "middle" }); t.textContent = fr(v); if (d === 480) { t.style.fill = "var(--ink)"; t.style.fontWeight = 600; }
+    const hit = mk("circle", { cx: lx(d), cy: y(v), r: 16, fill: "transparent" });
+    bindTip(hit, ["Délai " + d + " ms", "CER moyen annoncé " + pct(v)]);
+  });
+  host.append(svg);
+}
+delayChart();
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(delayChart, 120); });
+
+/* Tableau comparatif */
+(function () {
+  const t = document.getElementById("t-compare");
+  const hr = el("tr"); ["Indicateur", "Model card", "Mesuré (vLLM)", "Écart", "Mesuré (Transformers)", "Statut"].forEach((h, i) => hr.append(el("th", i && i < 5 ? "num" : null, h)));
+  const th = el("thead"); th.append(hr); t.append(th);
+  const tb = el("tbody");
+  const row = (name, card, m, tf, st, stl) => {
+    const tr = el("tr");
+    const s = el("td"); const p = el("span", "pill " + st, stl); s.append(p);
+    tr.append(el("td", null, name), el("td", "num", card), el("td", "num", m), el("td", "num", m === "–" ? "–" : "+" + fr(parseFloat(m.replace(",", ".")) - parseFloat(card.replace(",", "."))) + " pt"), el("td", "num", tf), s);
+    tb.append(tr);
+  };
+  row("CER global (moyenne sur 7 benchmarks)", "8,82 %", "–", "–", "warn", "Impossible à vérifier");
+  row("CER Prism (« ISMA »)", "6,68 %", pct(D.main.Prism.cer), pct(D.tf.Prism.cer), "serious", "Non reproduit");
+  row("CER Probe (« Darija in the Wild »)", "9,69 %", pct(D.main.Probe.cer), pct(D.tf.Probe.cer), "serious", "Non reproduit");
+  const tr = el("tr"); tr.append(el("td", null, "CER Casablanca"), el("td", "num", "20,34 %"), el("td", "num", "non évalué"), el("td", "num", "–"), el("td", "num", "–"));
+  const s = el("td"); s.append(el("span", "pill warn", "Hors périmètre")); tr.append(s); tb.append(tr);
+  t.append(tb);
+})();
+
+/* Robustesse */
+(function () {
+  const host = document.getElementById("robust");
+  [["Prism", 6.68], ["Probe", 9.69]].forEach(([s, card]) => {
+    const box = el("div"); box.append(el("p", "chart-title", "DarijaCS-" + s + " (annoncé " + pct(card) + ")"));
+    const v = D.variants.filter(x => x.subset === s).sort((a, b) => a.cer - b.cer);
+    const max = 18, min = 4, sc = x => 100 * (x - min) / (max - min);
+    const g = el("div", "hb");
+    v.forEach(r => {
+      g.append(el("div", "lab", r.label));
+      const tr = el("div", "track");
+      [4, 8, 12, 16].forEach(t => { const gl = el("div", "gridline"); gl.style.left = sc(t) + "%"; tr.append(gl); });
+      const rl = el("div", "ref"); rl.style.left = sc(card) + "%"; tr.append(rl);
+      const c = el("div", "conn"); c.style.left = sc(card) + "%"; c.style.width = (sc(r.cer) - sc(card)) + "%"; tr.append(c);
+      const d = el("div", "dot" + (r.label.startsWith("Principal") ? " main" : "")); d.style.left = sc(r.cer) + "%"; tr.append(d);
+      const hit = el("div", "hit"); tr.append(hit);
+      bindTip(hit, [r.label, "CER " + pct(r.cer), "Écart à l'annoncé : +" + fr(r.cer - card) + " pt"]);
+      g.append(tr, el("div", "val", pct(r.cer)));
+    });
+    g.append(el("div"));
+    const ax = el("div", "axis"); [4, 8, 12, 16].forEach(t => { const sp = el("span", null, String(t)); sp.style.left = sc(t) + "%"; ax.append(sp); });
+    g.append(ax, el("div"));
+    box.append(g); host.append(box);
+  });
+})();
+
+/* Tableau sensibilité */
+(function () {
+  const t = document.getElementById("t-sens");
+  const hr = el("tr"); ["Variante", "Prism", "Probe"].forEach((h, i) => hr.append(el("th", i ? "num" : null, h)));
+  const th = el("thead"); th.append(hr); t.append(th);
+  const S = D.sens; const tb = el("tbody");
+  [["Principal : normalisation officielle, CER corpus, espaces compris", pct(D.main.Prism.cer), pct(D.main.Probe.cer)],
+   ["CER moyen par enregistrement", pct(D.main.Prism.cerMacro), pct(D.main.Probe.cerMacro)],
+   ["Sans le doublon prism_188", pct(S.Prism_doublons_exacts_retires.cer), "–"],
+   ["Sans prism_246 ni prism_133", "8,54 %", "–"],
+   ["Annotations [..] retirées avant normalisation", "–", pct(S.Probe_annotations_crochets_retirees_avant_normalisation.cer)],
+   ["Sans probe_30", "–", pct(S.Probe_sans_probe_30.cer)],
+   ["Transformers : annotations [..] retirées", "–", pct(D.tf.sens.brackets)],
+   ["Repère : système tiers darija-stt-solutions-2607 (colonne du dataset)", "–", pct(S["Probe_systeme_tiers_colonne_dataset_darija-stt-solutions-2607"].cer)]]
+  .forEach(r => { const tr = el("tr"); r.forEach((c, i) => tr.append(el("td", i ? "num" : null, c))); tb.append(tr); });
+  t.append(tb);
+})();
+
+/* Catégories d'erreurs */
+(function () {
+  const cats = [["Variante orthographique / clitique", "var(--c1)", "#fff"], ["Substitution franche", "var(--c2)", "#fff"], ["Changement d'écriture (latin ↔ arabe)", "var(--c3)", "#15191d"], ["Suppression", "var(--c4)", "#15191d"], ["Insertion", "var(--c5)", "#15191d"]];
+  const lg = document.getElementById("cat-legend");
+  cats.forEach(([n, c]) => { const s = el("span"); const sw = el("i", "sw"); sw.style.background = c; s.append(sw, document.createTextNode(n)); lg.append(s); });
+  stacked(document.getElementById("cat-chart"), ["Prism", "Probe"].map(s => ({ label: s, unit: "mots", vals: D.cats[s] })), cats.map(([n, c, ink]) => ({ key: n, name: n, color: c, ink })));
+})();
+
+/* Erreurs par écriture */
+(function () {
+  const rows = [];
+  ["Prism", "Probe"].forEach(s => {
+    rows.push({ group: "DarijaCS-" + s });
+    D.script.filter(r => r.subset === s && r.ecriture_ref !== "chiffre").sort((a, b) => a.ecriture_ref.localeCompare(b.ecriture_ref)).forEach(r => {
+      const lat = r.ecriture_ref === "latin";
+      rows.push({ label: lat ? "Écriture latine" : "Écriture arabe", n: r.mots, v: r.erreur_pct, color: lat ? "var(--c2)" : "var(--c1)",
+        tip: [s + " · mots en écriture " + r.ecriture_ref, r.mots + " mots de référence", "Erreur " + pct(r.erreur_pct, 1), "Substitutions même écriture : " + r.subst_meme_ecriture, "Écrits dans l'autre écriture : " + r.subst_vers_autre_ecriture, "Supprimés : " + r.supprime] });
+    });
+  });
+  hbars(document.getElementById("script-chart"), rows, { max: 40, step: 10 });
+})();
+
+/* Diff mot à mot (plus longue sous-séquence commune) */
+function diff(a, b) {
+  const n = a.length, m = b.length, L = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = a[i] === b[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const ka = new Array(n).fill(false), kb = new Array(m).fill(false); let i = 0, j = 0;
+  while (i < n && j < m) { if (a[i] === b[j]) { ka[i] = kb[j] = true; i++; j++; } else if (L[i + 1][j] >= L[i][j + 1]) i++; else j++; }
+  return [ka, kb];
+}
+function textLine(words, keep, cls) {
+  const t = el("div", "t"); t.setAttribute("dir", "rtl");
+  if (!words.length) { t.append(el("span", "empty", "(vide)")); return t; }
+  words.forEach((w, k) => { if (k) t.append(document.createTextNode(" ")); t.append(keep[k] ? document.createTextNode(w) : el("span", cls, w)); });
+  return t;
+}
+function card(id, head, ref, hyp, note) {
+  const box = el("div", "ex");
+  const h = el("div", "ex-head"); head.forEach(([c, txt]) => h.append(el("span", c, txt))); box.append(h);
+  if (note) box.append(el("div", "ex-type", note));
+  const a = ref.split(" ").filter(Boolean), b = hyp.split(" ").filter(Boolean); const [ka, kb] = diff(a, b);
+  const r1 = el("div", "tl"); r1.append(el("span", "k", "Réf."), textLine(a, ka, "del"));
+  const r2 = el("div", "tl"); r2.append(el("span", "k", "Hyp."), textLine(b, kb, "ins"));
+  box.append(r1, r2); return box;
+}
+(function () {
+  const host = document.getElementById("examples");
+  D.examples.forEach(e => host.append(card(e.id, [["id", e.id], ["cer", "CER " + fr(e.cer, 1) + " %"]], e.ref, e.hyp, e.type)));
+})();
+
+/* Explorateur */
+(function () {
+  const host = document.getElementById("explorer"), more = document.getElementById("more"), count = document.getElementById("f-count");
+  const fs = document.getElementById("f-subset"), so = document.getElementById("f-sort"), q = document.getElementById("f-q"), er = document.getElementById("f-err");
+  let list = [], shown = 0;
+  const render = (reset) => {
+    if (reset) {
+      const s = fs.value, needle = q.value.trim().toLowerCase();
+      list = D.rows.filter(r => (!s || r[1] === s) && (!er.checked || r[2] > 0) &&
+        (!needle || r[0].toLowerCase().includes(needle) || r[5].toLowerCase().includes(needle) || r[6].toLowerCase().includes(needle) || r[7].toLowerCase().includes(needle)));
+      if (so.value === "cer-desc") list.sort((a, b) => b[2] - a[2]); else if (so.value === "cer-asc") list.sort((a, b) => a[2] - b[2]);
+      else list.sort((a, b) => a[1].localeCompare(b[1]) || parseInt(a[0].split("_")[1]) - parseInt(b[0].split("_")[1]));
+      host.replaceChildren(); shown = 0;
+      count.textContent = list.length + " enregistrement" + (list.length > 1 ? "s" : "");
+    }
+    list.slice(shown, shown + 20).forEach(r => host.append(card(r[0],
+      [["id", r[0]], ["cer", "CER " + fr(r[2], 1) + " %"], ["tag", "WER " + fr(r[3], 1) + " % · " + fr(r[4], 1) + " s"], ["tag", r[5]]], r[6], r[7])));
+    shown += 20; more.hidden = shown >= list.length;
+  };
+  [fs, so, er].forEach(c => c.addEventListener("change", () => render(true)));
+  let deb; q.addEventListener("input", () => { clearTimeout(deb); deb = setTimeout(() => render(true), 150); });
+  more.addEventListener("click", () => render(false));
+  render(true);
+})();
+</script>
+</body>
+</html>
