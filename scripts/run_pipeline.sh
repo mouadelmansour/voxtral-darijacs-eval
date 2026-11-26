@@ -124,10 +124,17 @@ step_analysis () {
   python analysis/error_analysis.py "$RUN/predictions_scored.csv" "$A"
   python eval/analyse_canaux_prism.py "$RUN" && mv -f eval/analyse_canaux_prism.csv "$A/" || true
   python eval/inspect_prism_133.py "$RUN" "$RUN/transformers" > "$A/prism_133.txt" 2>&1 || true
+  # Reproductibilité : comparaison avec les résultats originaux du 12 novembre 2026, s'ils sont présents
+  if [ -f results/run_20261112_0440/predictions_scored.csv ]; then
+    python eval/compare_runs.py results/run_20261112_0440/predictions_scored.csv "$RUN/predictions_scored.csv" \
+      "original 2026-11-12" "nouvelle exécution" > "$A/comparaison_original.txt" 2>&1 || true
+    head -4 "$A/comparaison_original.txt"
+  fi
   if [ -f "$RUN/transformers/metrics.json" ]; then
     mkdir -p "$A/results/vllm_realtime" "$A/results/transformers"
     cp "$RUN/metrics.json" "$A/results/vllm_realtime/"; cp "$RUN/transformers/metrics.json" "$A/results/transformers/"
-    python analysis/make_figures.py --results "$A/results" --analysis "$A" --out "$A/figures"
+    python analysis/make_figures.py --results "$A/results" --analysis "$A" --out "$A/figures" \
+      || echo "Figures non générées (installer matplotlib pour les obtenir)"
   fi
 }
 

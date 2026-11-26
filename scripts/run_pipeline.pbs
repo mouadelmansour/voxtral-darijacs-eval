@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -N voxtral_repro
+#PBS -l select=1:ncpus=20:mem=180gb:ngpus=1
+#PBS -l walltime=24:00:00
+#PBS -q gpu_1d
+#PBS -o logs/run_pipeline.log
+#PBS -e logs/run_pipeline.err
+
+# Exécution complète du dépôt sur le cluster PBS (sans conteneur), avec scripts/run_pipeline.sh.
+# Prérequis, sur le nœud de connexion (accès Internet) :
+#   bash scripts/run_pipeline.sh download prepare
+# Puis : qsub scripts/run_pipeline.pbs        (résultats dans work/runs/run_repro)
+set -eo pipefail
+cd "$PBS_O_WORKDIR"
+mkdir -p logs
+module load /app/common/modules/anaconda3-2024.10
+eval "$("$(command -v conda)" shell.bash hook)"
+source activate voxtral_eval
+export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+export RUN="${RUN:-eval/runs/run_repro}"
+bash scripts/run_pipeline.sh evaluate transformers verify analysis

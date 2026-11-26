@@ -43,3 +43,10 @@ les dates réelles des exécutions sont ci-dessous.
 ## 2026-11-24 : publication
 
 - Création du dépôt, image Podman (`Containerfile`) et pipeline hors cluster (`scripts/run_pipeline.sh`).
+
+## 2026-11-25 : sauvegarde des résultats
+
+- Le dossier de travail du cluster a été supprimé. Les résultats originaux de l'évaluation principale
+  (`metrics.json`, `predictions_scored.csv`, `environment.txt`) et la synthèse des tests de robustesse
+  sont conservés dans `results/`.
+- Ajout de `scripts/run_pipeline.pbs` pour régénérer toutes les sorties à partir du dépôt seul.

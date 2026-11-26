@@ -67,8 +67,9 @@ analysis/                      analyse d'erreurs, figures et page web du rapport
 scripts/
   download_assets.sh           modèle et dataset aux révisions exactes
   run_pipeline.sh              pipeline complet hors cluster (utilisé par l'image)
+  run_pipeline.pbs             le même pipeline lancé comme job PBS
 Containerfile, container/environment.yml, requirements.lock   construction de l'image Podman
-results/                       résultats de l'évaluation sur le cluster (prédictions, métriques)
+results/                       résultats originaux de l'évaluation sur le cluster (voir results/README.md)
 CHANGELOG.md                   chronologie des exécutions et des corrections
 ```
 
@@ -143,6 +144,15 @@ qsub eval/run_verify.pbs                         # tests A à E
 
 `run_transformers.pbs` et `run_verify.pbs` contiennent les noms des dossiers de l'exécution du cluster
 (`eval/runs/run_20261112_0440`). Adaptez-les à votre propre exécution.
+
+Pour tout relancer sur un cluster PBS avec le pipeline du dépôt (mêmes commandes que l'image Podman) :
+
+```bash
+bash scripts/run_pipeline.sh download prepare     # sur le nœud de connexion (accès Internet)
+qsub scripts/run_pipeline.pbs                      # évaluation, contrôle Transformers, tests de robustesse, analyses
+```
+
+Les résultats sont écrits dans `work/runs/run_repro/`. Les figures nécessitent `matplotlib` (absent de l'environnement du cluster).
 
 ## Limites connues
 
