@@ -1,0 +1,10 @@
+.git
+work/
+results/
+docs/
+logs/
+data-test/
+Voxtral-Mini-4B-Realtime-Arabic/
+eval/runs/
+**/__pycache__/
+*.log

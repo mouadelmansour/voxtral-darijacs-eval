@@ -1,0 +1,10 @@
+# Couche conda de l'image : mêmes versions que l'environnement « voxtral_eval » du cluster
+# (Python 3.11, ffmpeg 7.1 de conda-forge). Les paquets Python sont installés ensuite avec pip
+# depuis requirements.lock, comme sur le cluster.
+name: base
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - ffmpeg=7.1
+  - pip
